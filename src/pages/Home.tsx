@@ -17,7 +17,7 @@ const stats = [
   { value: '1000+', label: 'Happy Clients' },
 ];
 
-export function Home() {
+function Home() {
   const navigate = useNavigate();
   const { videos, loading } = useYouTube();
   const featuredVideos = videos.slice(0, 6);
@@ -265,3 +265,4 @@ export function Home() {
     </div>
   );
 }
+export default Home;

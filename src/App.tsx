@@ -1,29 +1,24 @@
-import { useState } from 'react';
-import { Navbar } from './components/Navbar';
-import { Footer } from './components/Footer';
-import { Home } from './pages/Home';
-import { Videos } from './pages/Videos';
-import { About } from './pages/About';
-import type { Page } from './types/youtube';
+import { Routes, Route } from "react-router-dom";
+import Navbar from "./components/Navbar";
+import Footer from "./components/Footer";
+import Home from "./pages/Home";
+import { About } from "./pages/About";
+import { Videos } from "./pages/Videos";
 
 function App() {
-  const [currentPage, setCurrentPage] = useState<Page>('home');
-
-  const handleNavigate = (page: Page) => {
-    setCurrentPage(page);
-  };
-
   return (
     <div className="min-h-screen flex flex-col">
-      <Navbar currentPage={currentPage} onNavigate={handleNavigate} />
+      <Navbar />
 
       <main className="flex-1">
-        {currentPage === 'home' && <Home onNavigate={handleNavigate} />}
-        {currentPage === 'videos' && <Videos />}
-        {currentPage === 'about' && <About />}
+        <Routes>
+          <Route path="/" element={<Home />} />
+          <Route path="/about" element={<About />} />
+          <Route path="/videos" element={<Videos />} />
+        </Routes>
       </main>
 
-      <Footer onNavigate={handleNavigate} />
+      <Footer />
     </div>
   );
 }

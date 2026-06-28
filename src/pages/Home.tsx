@@ -1,11 +1,7 @@
 import { Play, Home as HomeIcon, TrendingUp, Key, Building2, ChevronRight, Star, Phone, MapPin } from 'lucide-react';
 import { useYouTube } from '../hooks/useYouTube';
 import { VideoCard } from '../components/VideoCard';
-import type { Page } from '../types/youtube';
-
-interface HomeProps {
-  onNavigate: (page: Page) => void;
-}
+import { useNavigate } from 'react-router-dom';
 
 const services = [
   { icon: HomeIcon, label: 'Sale', desc: 'Premium property sale listings across Delhi NCR' },
@@ -21,7 +17,8 @@ const stats = [
   { value: '1000+', label: 'Happy Clients' },
 ];
 
-export function Home({ onNavigate }: HomeProps) {
+export function Home() {
+  const navigate = useNavigate();
   const { videos, loading } = useYouTube();
   const featuredVideos = videos.slice(0, 6);
 
@@ -78,7 +75,7 @@ export function Home({ onNavigate }: HomeProps) {
 
               <div className="flex flex-wrap gap-4">
                 <button
-                  onClick={() => onNavigate('videos')}
+                  onClick={() => navigate('/videos')}
                   className="btn-gold flex items-center gap-2 text-sm"
                 >
                   <Play size={16} className="fill-[#0A0805]" />
@@ -183,7 +180,7 @@ export function Home({ onNavigate }: HomeProps) {
               <div className="gold-divider max-w-[120px] mt-4" />
             </div>
             <button
-              onClick={() => onNavigate('videos')}
+              onClick={() => navigate('/videos')}
               className="flex items-center gap-2 text-sm text-[#D4AF37] hover:text-[#FFD700] transition-colors group font-medium self-start sm:self-auto"
             >
               View All Videos
@@ -216,7 +213,7 @@ export function Home({ onNavigate }: HomeProps) {
           {!loading && featuredVideos.length > 0 && (
             <div className="text-center mt-10">
               <button
-                onClick={() => onNavigate('videos')}
+                onClick={() => navigate('/videos')}
                 className="btn-glass text-sm"
               >
                 Explore All Property Videos

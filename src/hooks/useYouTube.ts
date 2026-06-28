@@ -31,19 +31,15 @@ export function useYouTube() {
         params.append('pageToken', pageToken);
       }
 
-      const url = `https://www.googleapis.com/youtube/v3/playlistItems?${params.toString()}`;
-
-      console.log('Fetching:', url);
-
-      const res = await fetch(url);
+      const res = await fetch(
+        `https://www.googleapis.com/youtube/v3/playlistItems?${params.toString()}`
+      );
 
       if (!res.ok) {
         throw new Error(`YouTube API error: ${res.status}`);
       }
 
       const data = await res.json();
-
-      console.log('YouTube Response:', data);
 
       if (data.error) {
         throw new Error(data.error.message || 'YouTube API Error');
@@ -58,14 +54,10 @@ export function useYouTube() {
           snippet: item.snippet,
         }));
 
-      console.log('Mapped Videos:', items);
-
       setVideos(prev => (pageToken ? [...prev, ...items] : items));
       setNextPageToken(data.nextPageToken);
       setHasMore(Boolean(data.nextPageToken));
     } catch (err) {
-      console.error('YouTube Hook Error:', err);
-
       setError(
         err instanceof Error
           ? err.message

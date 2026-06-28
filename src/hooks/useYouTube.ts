@@ -8,13 +8,17 @@ export function useYouTube() {
   const [videos, setVideos] = useState<YouTubeVideo[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [nextPageToken, setNextPageToken] = useState<string | undefined>();
+  const [nextPageToken, setNextPageToken] = useState<string>();
   const [hasMore, setHasMore] = useState(false);
 
   const fetchVideos = useCallback(async (pageToken?: string) => {
     try {
       setLoading(true);
       setError(null);
+
+      if (!API_KEY) {
+        throw new Error('Missing YouTube API Key');
+      }
 
       const params = new URLSearchParams({
         part: 'snippet',
@@ -27,9 +31,11 @@ export function useYouTube() {
         params.append('pageToken', pageToken);
       }
 
-      const res = await fetch(
-        `https://www.googleapis.com/youtube/v3/playlistItems?${params.toString()}`
-      );
+      const url = `https://www.googleapis.com/youtube/v3/playlistItems?${params.toString()}`;
+
+      console.log('Fetching:', url);
+
+      const res = await fetch(url);
 
       if (!res.ok) {
         throw new Error(`YouTube API error: ${res.status}`);
@@ -37,23 +43,34 @@ export function useYouTube() {
 
       const data = await res.json();
 
+      console.log('YouTube Response:', data);
+
       if (data.error) {
-        throw new Error(data.error.message || 'YouTube API error');
+        throw new Error(data.error.message || 'YouTube API Error');
       }
 
-      const items =
-        (data.items || []).map((item: any) => ({
+      const items: YouTubeVideo[] = (data.items || [])
+        .filter((item: any) => item?.snippet?.resourceId?.videoId)
+        .map((item: any) => ({
           id: {
             videoId: item.snippet.resourceId.videoId,
           },
           snippet: item.snippet,
         }));
 
+      console.log('Mapped Videos:', items);
+
       setVideos(prev => (pageToken ? [...prev, ...items] : items));
       setNextPageToken(data.nextPageToken);
       setHasMore(Boolean(data.nextPageToken));
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to load videos');
+      console.error('YouTube Hook Error:', err);
+
+      setError(
+        err instanceof Error
+          ? err.message
+          : 'Failed to load videos'
+      );
     } finally {
       setLoading(false);
     }
@@ -69,5 +86,11 @@ export function useYouTube() {
     }
   }, [nextPageToken, loading, fetchVideos]);
 
-  return { videos, loading, error, hasMore, loadMore };
+  return {
+    videos,
+    loading,
+    error,
+    hasMore,
+    loadMore,
+  };
 }

@@ -2,7 +2,7 @@ import { useState, useEffect, useCallback } from 'react';
 import type { YouTubeVideo } from '../types/youtube';
 
 const API_KEY = import.meta.env.VITE_YOUTUBE_API_KEY;
-const CHANNEL_ID = 'UCcIBFWyXF4YgSubKfLiallw';
+const PLAYLIST_ID = 'PLYjkaPSA54tY';
 
 export function useYouTube() {
   const [videos, setVideos] = useState<YouTubeVideo[]>([]);
@@ -18,10 +18,8 @@ export function useYouTube() {
 
       const params = new URLSearchParams({
         part: 'snippet',
-        channelId: CHANNEL_ID,
+        playlistId: PLAYLIST_ID,
         maxResults: '24',
-        order: 'date',
-        type: 'video',
         key: API_KEY,
       });
 
@@ -30,7 +28,7 @@ export function useYouTube() {
       }
 
       const res = await fetch(
-        `https://www.googleapis.com/youtube/v3/search?${params.toString()}`
+        `https://www.googleapis.com/youtube/v3/playlistItems?${params.toString()}`
       );
 
       if (!res.ok) {
@@ -43,9 +41,13 @@ export function useYouTube() {
         throw new Error(data.error.message || 'YouTube API error');
       }
 
-      const items: YouTubeVideo[] = (data.items || []).filter(
-        (item: YouTubeVideo) => item.id?.videoId
-      );
+      const items =
+        (data.items || []).map((item: any) => ({
+          id: {
+            videoId: item.snippet.resourceId.videoId,
+          },
+          snippet: item.snippet,
+        }));
 
       setVideos(prev => (pageToken ? [...prev, ...items] : items));
       setNextPageToken(data.nextPageToken);

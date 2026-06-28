@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import type { YouTubeVideo } from '../types/youtube';
 
-const API_KEY = 'AIzaSyD0d-QP631azjg_Ua0ec5Iw8yZkVc1xRDg';
+const API_KEY = import.meta.env.VITE_YOUTUBE_API_KEY;
 const CHANNEL_ID = 'UCcIBFWyXF4YgSubKfLiallw';
 
 export function useYouTube() {

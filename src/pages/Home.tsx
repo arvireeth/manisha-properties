@@ -64,7 +64,7 @@ function Home() {
         content="Buy, Sell & Rent properties in Delhi NCR" />
       <meta name="twitter:image"
         content="https://manishaproperties.in/images/Logo.jpg" />
-      <script type="application/ld+json">
+<script type="application/ld+json">
 {JSON.stringify({
   "@context": "https://schema.org",
   "@type": "RealEstateAgent",
@@ -75,31 +75,116 @@ function Home() {
 
   "logo": "https://manishaproperties.in/images/Logo.jpg",
 
-  "image": "https://manishaproperties.in/images/Logo.jpg",
-
-  "telephone": "+91-8700204768",
-
-  "email": "manishaguptaproperties@gmail.com",
-
-  "address": {
-    "@type": "PostalAddress",
-    "addressLocality": "Moti Nagar",
-    "addressRegion": "Delhi",
-    "postalCode": "110015",
-    "addressCountry": "IN"
-  },
-
+  "image":[
+  "https://manishaproperties.in/images/Logo.jpg"
+],
+"telephone":"+91-8700204768",
+  "contactPoint":[
+{
+ "@type":"ContactPoint",
+ "telephone":"+91-8700204768",
+ "contactType":"customer service",
   "areaServed": [
     "Delhi",
     "Delhi NCR",
     "Gurgaon",
     "Noida"
   ],
+ "availableLanguage":[
+   "English",
+   "Hindi"
+ ]
+}
+],
+
+  "email":"mailto:manishaguptaproperties@gmail.com",
+
+  "address": {
+    "@type": "PostalAddress",
+    "streetAddress": "Block 3, Ground Floor, CSP Unit No-1, DLF Capital Greens, Moti Nagar",
+    "addressLocality": "Moti Nagar",
+    "addressRegion": "Delhi",
+    "postalCode": "110015",
+    "addressCountry": {
+      "@type": "Country",
+      "name": "India"
+    }
+  },
+
+  "geo": {
+    "@type": "GeoCoordinates",
+    "latitude": "28.660133",
+    "longitude": "77.153424"
+  },
+
+  "openingHours": [
+    "Mo-Su 10:00-19:00"
+  ],
+
+  "founder": {
+    "@type": "Person",
+    "name": "Manisha Gupta"
+  },
+
+  "foundingDate": "2015",
 
   "description":
     "Trusted DLF Authorized Channel Partner providing property buying, selling, rental, investment consulting and property management services.",
+  
+    "slogan":"Trusted DLF Authorized Channel Partner",
 
   "priceRange": "₹₹",
+  "makesOffer":[
+  {
+    "@type":"Offer",
+    "itemOffered":{
+      "@type":"Service",
+      "name":"Property Buying"
+    }
+  },
+  {
+    "@type":"Offer",
+    "itemOffered":{
+      "@type":"Service",
+      "name":"Property Selling"
+    }
+  },
+  {
+    "@type":"Offer",
+    "itemOffered":{
+      "@type":"Service",
+      "name":"Property Rental"
+    }
+  },
+  {
+    "@type":"Offer",
+    "itemOffered":{
+      "@type":"Service",
+      "name":"Pre-Rented Property Investment"
+    }
+  },
+  {
+    "@type":"Offer",
+    "itemOffered":{
+      "@type":"Service",
+      "name":"Property Management"
+    }
+  },
+  {
+    "@type":"Offer",
+    "itemOffered":{
+      "@type":"Service",
+      "name":"Commercial Property Consulting"
+    }
+  },
+  {
+    "@type":"Offer",
+    "itemOffered":{
+      "@type":"Service",
+      "name":"Residential Property Consulting"
+    }
+  }
+],
 
   "sameAs": [
     "https://www.youtube.com/channel/UCcIBFWyXF4YgSubKfLiallw"

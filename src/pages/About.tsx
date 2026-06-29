@@ -1,5 +1,5 @@
 import { Phone, MapPin, Award, Users, TrendingUp, Shield, Star, Youtube, CheckCircle } from 'lucide-react';
-
+import { Helmet } from "react-helmet-async";
 const achievements = [
   { icon: Award, label: 'DLF Channel Partner', desc: 'Official authorized partner for DLF properties' },
   { icon: Users, label: '1000+ Happy Clients', desc: 'Trusted by families and investors across Delhi NCR' },
@@ -20,6 +20,72 @@ const services = [
 
 export function About() {
   return (
+    <>
+    <Helmet>
+  <title>
+    About Manisha Properties | Trusted DLF Channel Partner in Delhi NCR
+  </title>
+
+  <meta
+    name="description"
+    content="Learn about Manisha Properties, a trusted DLF Channel Partner offering property buying, selling, rentals, investment guidance and property management services across Delhi NCR."
+  />
+
+  <meta
+    name="keywords"
+    content="About Manisha Properties, DLF Channel Partner, Delhi NCR Property Consultant, Real Estate Advisor, Property Management, Moti Nagar"
+  />
+
+  <link
+    rel="canonical"
+    href="https://manishaproperties.in/about"
+  />
+
+  <meta
+    property="og:title"
+    content="About Manisha Properties"
+  />
+
+  <meta
+    property="og:description"
+    content="Trusted DLF Channel Partner serving Delhi NCR with premium real estate solutions."
+  />
+
+  <meta
+    property="og:type"
+    content="website"
+  />
+
+  <meta
+    property="og:url"
+    content="https://manishaproperties.in/about"
+  />
+
+  <meta
+    property="og:image"
+    content="https://manishaproperties.in/images/Logo.jpg"
+  />
+
+  <meta
+    name="twitter:card"
+    content="summary_large_image"
+  />
+
+  <meta
+    name="twitter:title"
+    content="About Manisha Properties"
+  />
+
+  <meta
+    name="twitter:description"
+    content="Trusted Property Advisors & Consultants in Delhi NCR."
+  />
+
+  <meta
+    name="twitter:image"
+    content="https://manishaproperties.in/images/Logo.jpg"
+  />
+</Helmet>
     <div className="min-h-screen pt-28 pb-20">
       {/* Hero */}
       <section className="relative px-4 sm:px-6 lg:px-8 pb-24">
@@ -244,6 +310,8 @@ export function About() {
           </div>
         </div>
       </section>
+
     </div>
+  </>
   );
 }

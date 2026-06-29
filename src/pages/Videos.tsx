@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { Helmet } from "react-helmet-async";
 import { Search, Youtube, Loader2, AlertCircle, RefreshCcw } from 'lucide-react';
 import { useYouTube } from '../hooks/useYouTube';
 import { VideoCard } from '../components/VideoCard';
@@ -14,7 +15,73 @@ export function Videos() {
       )
     : videos;
 
-  return (
+return (
+  <>
+    <Helmet>
+  <title>
+    Property Videos | Manisha Properties | Delhi NCR Real Estate
+  </title>
+
+  <meta
+    name="description"
+    content="Watch the latest property walkthroughs, investment opportunities, DLF projects and real estate updates from Manisha Properties across Delhi NCR."
+  />
+
+  <meta
+    name="keywords"
+    content="Property Videos, DLF Projects, Delhi NCR Real Estate, Property Tours, Apartments Delhi, Manisha Properties"
+  />
+
+  <link
+    rel="canonical"
+    href="https://manishaproperties.in/videos"
+  />
+
+  <meta
+    property="og:title"
+    content="Property Videos | Manisha Properties"
+  />
+
+  <meta
+    property="og:description"
+    content="Explore premium property walkthroughs and investment opportunities across Delhi NCR."
+  />
+
+  <meta
+    property="og:type"
+    content="website"
+  />
+
+  <meta
+    property="og:url"
+    content="https://manishaproperties.in/videos"
+  />
+
+  <meta
+    property="og:image"
+    content="https://manishaproperties.in/images/Logo.jpg"
+  />
+
+  <meta
+    name="twitter:card"
+    content="summary_large_image"
+  />
+
+  <meta
+    name="twitter:title"
+    content="Property Videos | Manisha Properties"
+  />
+
+  <meta
+    name="twitter:description"
+    content="Watch premium property tours and investment videos."
+  />
+
+  <meta
+    name="twitter:image"
+    content="https://manishaproperties.in/images/Logo.jpg"
+  />
+</Helmet>
     <div className="min-h-screen pt-28 pb-20 px-4 sm:px-6 lg:px-8">
       <div className="max-w-7xl mx-auto">
         {/* Header */}
@@ -173,5 +240,6 @@ export function Videos() {
       </div>
 
     </div>
-  );
+  </>
+);
 }

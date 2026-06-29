@@ -64,6 +64,48 @@ function Home() {
         content="Buy, Sell & Rent properties in Delhi NCR" />
       <meta name="twitter:image"
         content="https://manishaproperties.in/images/Logo.jpg" />
+      <script type="application/ld+json">
+{JSON.stringify({
+  "@context": "https://schema.org",
+  "@type": "RealEstateAgent",
+
+  "name": "Manisha Properties Advisors & Consultants",
+
+  "url": "https://manishaproperties.in",
+
+  "logo": "https://manishaproperties.in/images/Logo.jpg",
+
+  "image": "https://manishaproperties.in/images/Logo.jpg",
+
+  "telephone": "+91-8700204768",
+
+  "email": "manishaguptaproperties@gmail.com",
+
+  "address": {
+    "@type": "PostalAddress",
+    "addressLocality": "Moti Nagar",
+    "addressRegion": "Delhi",
+    "postalCode": "110015",
+    "addressCountry": "IN"
+  },
+
+  "areaServed": [
+    "Delhi",
+    "Delhi NCR",
+    "Gurgaon",
+    "Noida"
+  ],
+
+  "description":
+    "Trusted DLF Authorized Channel Partner providing property buying, selling, rental, investment consulting and property management services.",
+
+  "priceRange": "₹₹",
+
+  "sameAs": [
+    "https://www.youtube.com/channel/UCcIBFWyXF4YgSubKfLiallw"
+  ]
+})}
+</script>
     </Helmet>
 
     <div className="min-h-screen">

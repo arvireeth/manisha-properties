@@ -1,4 +1,5 @@
 import { Play, Home as HomeIcon, TrendingUp, Key, Building2, ChevronRight, Star, Phone, MapPin } from 'lucide-react';
+import { Helmet } from "react-helmet-async";
 import { useYouTube } from '../hooks/useYouTube';
 import { VideoCard } from '../components/VideoCard';
 import { useNavigate } from 'react-router-dom';
@@ -22,7 +23,49 @@ function Home() {
   const { videos, loading } = useYouTube();
   const featuredVideos = videos.slice(0, 6);
 
-  return (
+ return (
+  <>
+    <Helmet>
+     <title>
+       Manisha Properties | DLF Channel Partner | Buy, Sell & Rent Properties in Delhi NCR
+     </title>
+
+     <meta
+        name="description"
+        content="Manisha Properties helps you buy, sell, rent and manage residential and commercial properties across Delhi NCR. Trusted DLF Channel Partner offering premium residential and commercial real estate solutions."
+     />
+
+     <meta
+        name="keywords"
+        content="Manisha Properties, Delhi NCR real estate, DLF Channel Partner, DLF Capital Greens, Moti Nagar properties, luxury apartments Delhi, flats for sale Delhi, rental properties Delhi, commercial properties Delhi NCR"
+      />
+
+      <link
+        rel="canonical"
+        href="https://manishaproperties.in/"
+      />
+      <meta property="og:title"
+        content="Manisha Properties | DLF Channel Partner" />
+
+      <meta property="og:description"
+        content="Buy, Sell & Rent premium properties across Delhi NCR." />
+
+      <meta property="og:type"
+        content="website" />
+
+      <meta property="og:url"
+        content="https://manishaproperties.in/" />
+
+      <meta property="og:image"
+        content="https://manishaproperties.in/images/Logo.jpg" />
+      <meta name="twitter:card" content="summary_large_image" />
+      <meta name="twitter:title" content="Manisha Properties" />
+      <meta name="twitter:description"
+        content="Buy, Sell & Rent properties in Delhi NCR" />
+      <meta name="twitter:image"
+        content="https://manishaproperties.in/images/Logo.jpg" />
+    </Helmet>
+
     <div className="min-h-screen">
       {/* Hero Section */}
       <section className="relative min-h-screen flex items-center justify-center overflow-hidden">
@@ -111,7 +154,7 @@ function Home() {
                 <div className="relative glass-card-strong p-2 max-w-sm w-full mx-auto">
                   <img
                     src="/images/Manisha_Properties_visiting_card.PNG"
-                    alt="Manisha Properties Visiting Card"
+                    alt="Manisha Properties Real Estate Consultant Delhi NCR"
                     className="w-full rounded-xl object-contain"
                   />
                 </div>
@@ -262,7 +305,9 @@ function Home() {
         </div>
       </section>
 
-    </div>
+     </div>
+  </>
   );
 }
+
 export default Home;

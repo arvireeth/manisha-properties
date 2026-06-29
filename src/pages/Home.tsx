@@ -105,10 +105,7 @@ function Home() {
     "addressLocality": "Moti Nagar",
     "addressRegion": "Delhi",
     "postalCode": "110015",
-    "addressCountry": {
-      "@type": "Country",
-      "name": "India"
-    }
+    "addressCountry": "IN",
   },
 
   "geo": {

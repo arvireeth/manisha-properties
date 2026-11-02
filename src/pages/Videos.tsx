@@ -140,13 +140,15 @@ export function Videos() {
                   Capital Greens property photograph.
                 </p>
                 <a
-                  href="https://www.youtube.com/playlist?list=PLYjkaPSA54tY"
+                  href="https://www.youtube.com/channel/UCcIBFWyXF4YgSubKfLiallw"
                   target="_blank"
                   rel="noopener noreferrer"
+                  aria-label="Explore Manisha Properties YouTube Channel"
                   className="btn-gold inline-flex items-center gap-2 mt-6 text-sm"
                 >
                   <Play size={15} fill="currentColor" />
-                  Explore Property Videos
+                  Explore Manisha Properties YouTube Channel
+                  <ExternalLink size={14} />
                 </a>
               </div>
             </div>

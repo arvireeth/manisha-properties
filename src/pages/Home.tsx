@@ -10,12 +10,14 @@ import {
   Star,
   Phone,
   MapPin,
+  MessageCircle,
 } from 'lucide-react';
 import { Helmet } from 'react-helmet-async';
 import { useRef } from 'react';
 import { useYouTube, YOUTUBE_PLAYLISTS } from '../hooks/useYouTube';
 import { VideoCard } from '../components/VideoCard';
 import { useNavigate } from 'react-router-dom';
+import WhatsAppEnquiry from '../components/WhatsAppEnquiry';
 
 const services = [
   { icon: HomeIcon, label: 'Sale', desc: 'Premium property sale listings across Delhi NCR' },
@@ -292,6 +294,16 @@ function Home() {
                   </button>
 
                   <a
+                    href="https://wa.me/918700204768?text=Hello%20Manisha%20Properties%2C%20I%20would%20like%20to%20enquire%20about%20a%20property."
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="btn-glass flex items-center gap-2 text-sm"
+                  >
+                    <MessageCircle size={16} />
+                    WhatsApp Us
+                  </a>
+
+                  <a
                     href="tel:8700204768"
                     className="btn-glass flex items-center gap-2 text-sm"
                   >
@@ -525,6 +537,8 @@ function Home() {
                   Connect with Manisha Gupta today for personalized property consultation.
                   Expert advice, transparent dealings, and the best properties in Delhi NCR.
                 </p>
+
+                <WhatsAppEnquiry />
 
                 <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mt-8">
                   <a

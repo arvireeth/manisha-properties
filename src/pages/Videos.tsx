@@ -1,5 +1,5 @@
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Helmet } from 'react-helmet-async';
 import {
   Youtube,
@@ -9,35 +9,42 @@ import {
   Phone,
   MessageCircle,
   ExternalLink,
+  X,
 } from 'lucide-react';
+import { useYouTube, YOUTUBE_PLAYLISTS } from '../hooks/useYouTube';
+import { VideoCard } from '../components/VideoCard';
 
 const playlists = [
   {
     title: 'Sale',
-    description: 'Explore residential properties for sale, premium apartment communities and attractive homes across Delhi NCR.',
+    description:
+      'Explore residential properties for sale, premium apartment communities and attractive homes across Delhi NCR.',
     image: '/images/properties/sale.jpg',
-    url: 'https://www.youtube.com/playlist?list=PLYjkaPSA54tY',
+    playlistId: YOUTUBE_PLAYLISTS.sale,
     imageAlt: 'Representative residential property photography for homes for sale',
   },
   {
     title: 'Rental',
-    description: 'Discover rental homes featuring comfortable living rooms, furnished bedrooms and modern interiors.',
+    description:
+      'Discover rental homes featuring comfortable living rooms, furnished bedrooms and modern interiors.',
     image: '/images/properties/rental.jpg',
-    url: 'https://www.youtube.com/playlist?list=PLYo9ildZkhfo',
+    playlistId: YOUTUBE_PLAYLISTS.rental,
     imageAlt: 'Furnished apartment living room for rental properties',
   },
   {
     title: 'Purchased',
-    description: 'Explore premium apartments and completed property purchases through Manisha Properties.',
+    description:
+      'Explore premium apartments and completed property purchases through Manisha Properties.',
     image: '/images/properties/purchased.jpg',
-    url: 'https://www.youtube.com/playlist?list=PLJocVtGV0psw',
+    playlistId: YOUTUBE_PLAYLISTS.purchased,
     imageAlt: 'Premium completed apartment interior',
   },
   {
     title: 'Occupied',
-    description: 'Discover residential properties and homes ready for comfortable living.',
+    description:
+      'Discover residential properties and homes ready for comfortable living.',
     image: '/images/properties/occupied.jpg',
-    url: 'https://www.youtube.com/playlist?list=PLdmLuIEZE-sQ',
+    playlistId: YOUTUBE_PLAYLISTS.occupied,
     imageAlt: 'Representative residential property photography',
   },
 ];
@@ -48,10 +55,260 @@ const subscribeUrl =
 const whatsappUrl =
   'https://wa.me/918700204768?text=Hello%20Manisha%20Properties%2C%20I%20am%20interested%20in%20your%20property%20listings.%20Please%20share%20more%20details.';
 
+type Playlist = (typeof playlists)[number];
+
+function PlaylistVideos({ playlist }: { playlist: Playlist }) {
+  const {
+  videos,
+  loading,
+  error,
+  hasMore,
+  loadMore,
+  refresh,
+} = useYouTube(playlist.playlistId);
+
+  useEffect(() => {
+    const refreshInterval = window.setInterval(() => {
+      if (!loading) {
+        refresh();
+      }
+    }, 5 * 60 * 1000);
+
+    return () => window.clearInterval(refreshInterval);
+  }, [loading, refresh]);
+
+  return (
+    <div className="min-w-0">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-6">
+        <div>
+          <span className="text-xs uppercase tracking-[0.2em] text-[#D4AF37] font-semibold">
+            Manisha Properties
+          </span>
+          <h3 className="font-serif text-2xl sm:text-3xl font-bold text-[#F8F4E8] mt-2">
+            {playlist.title} Videos
+          </h3>
+          <p className="text-sm text-[rgba(248,244,232,0.6)] mt-2">
+            Explore our latest {playlist.title.toLowerCase()} property videos.
+          </p>
+        </div>
+      <div className="flex justify-end mb-5">
+        <button
+           type="button"
+           onClick={refresh}
+           disabled={loading}
+           className="btn-glass inline-flex items-center gap-2 text-sm disabled:opacity-50"
+     >
+         <span className={loading ? 'animate-spin' : ''}>↻</span>
+         {loading ? 'Refreshing...' : 'Refresh Videos'}
+      </button>
+     </div>
+
+        {videos.length > 0 && (
+          <span className="self-start sm:self-center rounded-full border border-[#D4AF37]/30 bg-[#D4AF37]/10 px-3 py-1.5 text-xs text-[#D4AF37]">
+            {videos.length} loaded
+          </span>
+        )}
+      </div>
+
+      {loading && videos.length === 0 && (
+        <div className="text-center py-16">
+          <div className="w-9 h-9 border-2 border-[#D4AF37] border-t-transparent rounded-full animate-spin mx-auto" />
+          <p className="text-sm text-white/60 mt-4">
+            Loading {playlist.title.toLowerCase()} videos...
+          </p>
+        </div>
+      )}
+
+      {error && (
+        <div
+          role="alert"
+          className="rounded-xl border border-red-500/30 bg-red-500/10 p-6 text-center"
+        >
+          <p className="text-sm text-red-300">
+            Unable to load videos right now. Please close this window and
+            select the category again to retry.
+          </p>
+        </div>
+      )}
+
+      {!loading && !error && videos.length === 0 && (
+        <div className="rounded-xl border border-white/10 bg-white/5 p-10 text-center">
+          <Youtube size={32} className="text-[#D4AF37] mx-auto mb-3" />
+          <p className="text-white/70">
+            No videos are currently available in this playlist.
+          </p>
+        </div>
+      )}
+
+      {videos.length > 0 && (
+        <>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+            {videos.map((video) => (
+              <VideoCard key={video.id.videoId} video={video} />
+            ))}
+          </div>
+
+          {loading && (
+            <p className="text-center text-sm text-white/50 mt-5">
+              Loading more videos...
+            </p>
+          )}
+
+          {hasMore && (
+            <div className="text-center mt-8">
+              <button
+                type="button"
+                onClick={loadMore}
+                disabled={loading}
+                className="btn-glass inline-flex items-center gap-2 text-sm disabled:opacity-50"
+              >
+                {loading ? 'Loading...' : 'Load More Videos'}
+                <ChevronDown size={17} />
+              </button>
+            </div>
+          )}
+        </>
+      )}
+    </div>
+  );
+}
+
+function PlaylistModal({
+  playlist,
+  onSelect,
+  onClose,
+}: {
+  playlist: Playlist;
+  onSelect: (playlist: Playlist) => void;
+  onClose: () => void;
+}) {
+  return (
+    <div
+      className="fixed inset-0 z-[100] flex items-center justify-center bg-black/85 backdrop-blur-md p-2 sm:p-5"
+      onClick={onClose}
+    >
+      <div
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="playlist-modal-title"
+        className="relative flex flex-col w-full max-w-6xl max-h-[94vh] overflow-hidden rounded-2xl sm:rounded-3xl border border-[#D4AF37]/40 bg-[#17110B] shadow-2xl shadow-black/60"
+        onClick={(event) => event.stopPropagation()}
+      >
+        <header className="shrink-0 border-b border-[#D4AF37]/20 bg-[#1D160D] px-4 py-4 sm:px-7 sm:py-5">
+          <div className="flex items-start justify-between gap-4">
+            <div>
+              <span className="text-[10px] sm:text-xs uppercase tracking-[0.22em] text-[#D4AF37] font-semibold">
+                Manisha Properties
+              </span>
+              <h2
+                id="playlist-modal-title"
+                className="font-serif text-2xl sm:text-3xl font-bold text-[#F8F4E8] mt-1"
+              >
+                Property Video Gallery
+              </h2>
+              <p className="text-xs sm:text-sm text-white/55 mt-1">
+                Explore our property videos by category.
+              </p>
+            </div>
+
+            <button
+              type="button"
+              onClick={onClose}
+              aria-label="Close video gallery"
+              className="shrink-0 w-10 h-10 rounded-full border border-[#D4AF37]/40 bg-[#D4AF37]/10 text-[#D4AF37] flex items-center justify-center hover:bg-[#D4AF37] hover:text-black transition-colors"
+            >
+              <X size={22} />
+            </button>
+          </div>
+
+          <div
+            className="flex gap-2 overflow-x-auto mt-5 pb-1"
+            role="tablist"
+            aria-label="Property video categories"
+          >
+            {playlists.map((item) => {
+              const active = item.title === playlist.title;
+
+              return (
+                <button
+                  key={item.title}
+                  type="button"
+                  role="tab"
+                  aria-selected={active}
+                  onClick={() => onSelect(item)}
+                  className={`shrink-0 rounded-full px-5 py-2.5 text-sm font-semibold border transition-all ${
+                    active
+                      ? 'bg-[#D4AF37] text-[#17110B] border-[#D4AF37] shadow-lg shadow-[#D4AF37]/10'
+                      : 'bg-white/5 text-white/65 border-white/10 hover:border-[#D4AF37]/50 hover:text-[#D4AF37]'
+                  }`}
+                >
+                  {item.title}
+                </button>
+              );
+            })}
+          </div>
+        </header>
+
+        <div
+          className="flex-1 min-h-0 overflow-y-auto overscroll-contain p-4 sm:p-7"
+          key={playlist.playlistId}
+        >
+          <PlaylistVideos
+            key={playlist.playlistId}
+            playlist={playlist}
+          />
+        </div>
+
+        <footer className="shrink-0 border-t border-white/10 bg-[#1D160D] px-4 py-3 sm:px-7">
+          <div className="flex items-center justify-between gap-3">
+            <span className="text-[11px] sm:text-xs text-white/40">
+              Manisha Properties · Delhi NCR
+            </span>
+            <button
+              type="button"
+              onClick={onClose}
+              className="text-xs sm:text-sm font-semibold text-[#D4AF37] hover:text-white transition-colors"
+            >
+              Close Gallery
+            </button>
+          </div>
+        </footer>
+      </div>
+    </div>
+  );
+}
+
 export function Videos() {
   const [showAll, setShowAll] = useState(false);
+  const [selectedPlaylist, setSelectedPlaylist] =
+    useState<Playlist | null>(null);
 
   const visiblePlaylists = showAll ? playlists : playlists.slice(0, 2);
+
+  const handlePlaylistClick = (playlist: Playlist) => {
+    setSelectedPlaylist(playlist);
+  };
+
+  useEffect(() => {
+    if (!selectedPlaylist) return;
+
+    const previousOverflow = document.body.style.overflow;
+
+    document.body.style.overflow = 'hidden';
+
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') {
+        setSelectedPlaylist(null);
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+
+    return () => {
+      document.body.style.overflow = previousOverflow;
+      window.removeEventListener('keydown', handleKeyDown);
+    };
+  }, [selectedPlaylist]);
 
   return (
     <>
@@ -65,22 +322,40 @@ export function Videos() {
           name="keywords"
           content="Property Videos, DLF Capital Greens, Delhi NCR Real Estate, Property Tours, Apartments Delhi, Manisha Properties"
         />
-        <link rel="canonical" href="https://manishaproperties.in/videos" />
-        <meta property="og:title" content="Property Videos | Manisha Properties" />
+        <link
+          rel="canonical"
+          href="https://manishaproperties.in/videos"
+        />
+        <meta
+          property="og:title"
+          content="Property Videos | Manisha Properties"
+        />
         <meta
           property="og:description"
           content="Explore property sale, rental, purchased and occupied home videos across Delhi NCR."
         />
         <meta property="og:type" content="website" />
-        <meta property="og:url" content="https://manishaproperties.in/videos" />
-        <meta property="og:image" content="https://manishaproperties.in/images/Logo.jpg" />
+        <meta
+          property="og:url"
+          content="https://manishaproperties.in/videos"
+        />
+        <meta
+          property="og:image"
+          content="https://manishaproperties.in/images/Logo.jpg"
+        />
         <meta name="twitter:card" content="summary_large_image" />
-        <meta name="twitter:title" content="Property Videos | Manisha Properties" />
+        <meta
+          name="twitter:title"
+          content="Property Videos | Manisha Properties"
+        />
         <meta
           name="twitter:description"
           content="Explore premium property tours and real estate videos."
         />
-        <meta name="twitter:image" content="https://manishaproperties.in/images/Logo.jpg" />
+        <meta
+          name="twitter:image"
+          content="https://manishaproperties.in/images/Logo.jpg"
+        />
       </Helmet>
 
       <main className="min-h-screen pt-28 pb-20 px-4 sm:px-6 lg:px-8">
@@ -121,24 +396,29 @@ export function Videos() {
                 }}
                 className="absolute inset-0 w-full h-full object-cover opacity-40"
               />
+
               <div className="absolute inset-0 bg-gradient-to-r from-black/95 via-black/75 to-black/30" />
 
               <div className="relative z-10 px-6 py-12 sm:px-10 sm:py-16 max-w-3xl">
                 <span className="text-xs uppercase tracking-[0.22em] text-[#D4AF37] font-semibold">
                   Premium Residential Living
                 </span>
+
                 <h2 className="font-serif text-3xl sm:text-4xl font-bold text-white mt-3">
                   Explore DLF Capital Greens
                 </h2>
+
                 <p className="text-sm sm:text-base text-white/75 leading-relaxed mt-4 max-w-xl">
                   Discover premium residential communities and property
                   opportunities in Moti Nagar and across Delhi NCR with
                   Manisha Properties.
                 </p>
+
                 <p className="text-xs text-white/50 mt-3">
                   Representative stock photography; not an actual DLF
                   Capital Greens property photograph.
                 </p>
+
                 <a
                   href="https://www.youtube.com/channel/UCcIBFWyXF4YgSubKfLiallw"
                   target="_blank"
@@ -158,61 +438,63 @@ export function Videos() {
             aria-label="Property video categories"
             className="grid grid-cols-1 sm:grid-cols-2 gap-6 lg:gap-8"
           >
-            {visiblePlaylists.map((playlist) => (
-              <a
-                key={playlist.title}
-                href={playlist.url}
-                target="_blank"
-                rel="noopener noreferrer"
-                aria-label={`Watch ${playlist.title} property videos on YouTube`}
-                className="group glass-card-strong overflow-hidden rounded-2xl border border-[rgba(212,175,55,0.2)] hover:border-[rgba(212,175,55,0.65)] transition-all duration-300 hover:-translate-y-1 hover:shadow-2xl"
-              >
-                <div className="relative aspect-[16/9] overflow-hidden bg-[#171717]">
-                  <img
-                    src={playlist.image}
-                    alt={playlist.imageAlt}
-                    loading="lazy"
-                    onError={(event) => {
-                      event.currentTarget.onerror = null;
-                      event.currentTarget.src = '/images/Logo.jpg';
-                    }}
-                    className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
-                  />
+            {visiblePlaylists.map((playlist) => {
+              return (
+                <button
+                  key={playlist.title}
+                  type="button"
+                  onClick={() => handlePlaylistClick(playlist)}
+                  aria-label={`View ${playlist.title} property videos`}
+                  className="group glass-card-strong overflow-hidden rounded-2xl border border-[rgba(212,175,55,0.2)] text-left transition-all duration-300 hover:-translate-y-1 hover:shadow-2xl hover:border-[rgba(212,175,55,0.65)]"
+                >
+                  <div className="relative aspect-[16/9] overflow-hidden bg-[#171717]">
+                    <img
+                      src={playlist.image}
+                      alt={playlist.imageAlt}
+                      loading="lazy"
+                      onError={(event) => {
+                        event.currentTarget.onerror = null;
+                        event.currentTarget.src = '/images/Logo.jpg';
+                      }}
+                      className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+                    />
 
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/15 to-black/10" />
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/15 to-black/10" />
 
-                  <div className="absolute inset-0 flex items-center justify-center">
-                    <span className="w-16 h-16 rounded-full bg-[#D4AF37] text-[#171717] flex items-center justify-center shadow-xl transition-transform duration-300 group-hover:scale-110">
-                      <Play size={27} fill="currentColor" className="ml-1" />
-                    </span>
+                    <div className="absolute inset-0 flex items-center justify-center">
+                      <span className="w-16 h-16 rounded-full bg-[#D4AF37] text-[#171717] flex items-center justify-center shadow-xl transition-transform duration-300 group-hover:scale-110">
+                        <Play
+                          size={27}
+                          fill="currentColor"
+                          className="ml-1"
+                        />
+                      </span>
+                    </div>
+
+                    <div className="absolute bottom-4 left-5">
+                      <span className="text-xs uppercase tracking-[0.2em] text-[#D4AF37] font-semibold">
+                        Manisha Properties
+                      </span>
+                      <h2 className="text-3xl font-serif font-bold text-white mt-1">
+                        {playlist.title}
+                      </h2>
+                    </div>
                   </div>
 
-                  <div className="absolute bottom-4 left-5">
-                    <span className="text-xs uppercase tracking-[0.2em] text-[#D4AF37] font-semibold">
-                      Manisha Properties
-                    </span>
-                    <h2 className="text-3xl font-serif font-bold text-white mt-1">
-                      {playlist.title}
-                    </h2>
-                  </div>
+                  <div className="p-5 sm:p-6">
+                    <p className="text-sm text-[rgba(248,244,232,0.65)] leading-relaxed">
+                      {playlist.description}
+                    </p>
 
-                  <span className="absolute top-4 right-4 p-2 rounded-full bg-black/40 text-white">
-                    <ExternalLink size={17} />
-                  </span>
-                </div>
-
-                <div className="p-5 sm:p-6">
-                  <p className="text-sm text-[rgba(248,244,232,0.65)] leading-relaxed">
-                    {playlist.description}
-                  </p>
-                  <div className="flex items-center gap-2 mt-5 text-sm font-semibold text-[#D4AF37]">
-                    <Youtube size={17} />
-                    Watch Playlist
-                    <ExternalLink size={14} className="ml-auto" />
+                    <div className="flex items-center gap-2 mt-5 text-sm font-semibold text-[#D4AF37]">
+                      <Youtube size={17} />
+                      View Videos
+                      <Play size={14} className="ml-auto" />
+                    </div>
                   </div>
-                </div>
-              </a>
-            ))}
+                </button>
+              );
+            })}
           </section>
 
           <div className="text-center mt-9">
@@ -280,6 +562,14 @@ export function Videos() {
           </section>
         </div>
       </main>
+
+      {selectedPlaylist && (
+        <PlaylistModal
+          playlist={selectedPlaylist}
+          onSelect={setSelectedPlaylist}
+          onClose={() => setSelectedPlaylist(null)}
+        />
+      )}
     </>
   );
 }

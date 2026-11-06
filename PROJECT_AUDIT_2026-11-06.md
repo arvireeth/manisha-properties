@@ -158,3 +158,13 @@ Started the first ordered follow-up: accessibility and keyboard support.
 - Production deployment remains unchanged: READY commit 21ff3c69 on feature/pwa-installable-app, aliases include manishaproperties.in.
 - Latest local branch has no uncommitted changes; dist remains ignored and untracked by Git.
 - Outstanding authenticated checks: Google Cloud Console sign-in required to inspect YouTube API key HTTP-referrer/API restrictions; Vercel sign-in required for Chrome to exercise the protected preview itself.
+
+
+## YouTube API key restriction review — verified from authenticated Chrome tab
+- Google Cloud project "Youtube API Key" (project ID youtube-api-key-500806) shows API key "API key 1", created 28 June 2026.
+- API restriction is already limited to YouTube Data API v3.
+- Application restriction is currently "None"; Google Cloud explicitly recommends restricting where the key can be used.
+- Vercel project environment variables show VITE_YOUTUBE_API_KEY_PREVIEW assigned to Preview, and VITE_YOUTUBE_API_KEY assigned to Production and Preview. Source code chooses VITE_YOUTUBE_API_KEY_PREVIEW first, then VITE_YOUTUBE_API_KEY.
+- The June 28 Google key creation date matches the initial Vercel VITE_YOUTUBE_API_KEY setup date, so it is likely the production key; exact key-to-variable fingerprint matching was not performed. Do not apply application restrictions until that mapping is confirmed.
+- Safe target allowlist for the production key should be limited to the verified production hosts (manishaproperties.in, manishaproperties.vercel.app and the Vercel production project alias). Preview-specific key needs its own allowlist including the stable work-branch alias only if preview access is required. Avoid a broad *.vercel.app wildcard.
+- No API key was revealed, copied, rotated, or modified.

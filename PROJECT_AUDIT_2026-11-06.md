@@ -237,3 +237,5 @@ Started the first ordered follow-up: accessibility and keyboard support.
 - Fixed weather overlay stacking: moved from z-index 0 (behind content/stacking contexts) to z-index 40, screen-blended, pointer-events none, with stronger translucent particles. Simulated rain displayed 38 streaks and 9 droplets with expected CSS animation.
 - Current office live weather endpoint tested directly in Chrome: HTTP 200, Clear, 28°C. Thus the office location should not display rain at the time of this check. Visitor-location weather depends on permission; otherwise office weather is the fallback.
 - Revalidated lint, typecheck, build/PWA generation and diff checks successfully.
+
+- Added an explicit visitor-location retry/action to the weather widget. When location is unavailable, visitors can choose “Use my local weather”; when browser permission is denied, the widget explains that permission must be enabled in browser settings. Office weather remains the no-permission fallback.

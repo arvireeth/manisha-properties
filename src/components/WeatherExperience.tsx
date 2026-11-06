@@ -12,7 +12,7 @@ type WeatherNow = {
 };
 
 type WeatherResponse = { currentConditions?: WeatherNow };
-type WeatherContextValue = { businessWeather: WeatherNow | null; displayedWeather: WeatherNow | null; visitorWeather: WeatherNow | null; weatherUnavailable: boolean };
+type WeatherContextValue = { businessWeather: WeatherNow | null; displayedWeather: WeatherNow | null; visitorWeather: WeatherNow | null; weatherUnavailable: boolean; locationStatus: 'checking' | 'available' | 'denied' | 'unavailable'; requestVisitorWeather: () => void };
 
 const WeatherContext = createContext<WeatherContextValue | null>(null);
 const BUSINESS_COORDS = { latitude: 28.6601, longitude: 77.1534 };
@@ -133,6 +133,7 @@ export function WeatherExperience({ children }: { children: ReactNode }) {
   const [visitorWeather, setVisitorWeather] = useState<WeatherNow | null>(null);
   const [businessWeather, setBusinessWeather] = useState<WeatherNow | null>(null);
   const [weatherUnavailable, setWeatherUnavailable] = useState(false);
+  const [locationStatus, setLocationStatus] = useState<'checking' | 'available' | 'denied' | 'unavailable'>('checking');
 
   useEffect(() => {
     let active = true;
@@ -147,6 +148,7 @@ export function WeatherExperience({ children }: { children: ReactNode }) {
 
     const loadVisitorWeather = (latitude: number, longitude: number) => {
       visitorCoordinates = { latitude, longitude };
+      if (active) setLocationStatus('available');
       const cacheKey = 'mp-weather-visitor-' + latitude.toFixed(2) + '-' + longitude.toFixed(2);
       loadWeather(latitude, longitude, cacheKey)
         .then((data) => { if (active) setVisitorWeather(data); })
@@ -176,10 +178,14 @@ export function WeatherExperience({ children }: { children: ReactNode }) {
             try { sessionStorage.setItem('mp-location-coordinates', JSON.stringify({ latitude, longitude })); } catch { /* Session-only cache is optional. */ }
             loadVisitorWeather(latitude, longitude);
           },
-          () => { if (active) setVisitorWeather(null); },
+          () => { if (active) { setVisitorWeather(null); setLocationStatus('denied'); } },
           { enableHighAccuracy: false, timeout: 7000, maximumAge: 30 * 60 * 1000 }
         );
+      } else {
+        setLocationStatus('unavailable');
       }
+    } else if (!savedCoordinates) {
+      setLocationStatus('denied');
     }
 
     const refreshTimer = window.setInterval(() => {
@@ -196,6 +202,27 @@ export function WeatherExperience({ children }: { children: ReactNode }) {
     return () => { active = false; window.clearInterval(refreshTimer); };
   }, []);
 
+  const requestVisitorWeather = () => {
+    if (!('geolocation' in navigator)) {
+      setLocationStatus('unavailable');
+      return;
+    }
+    setLocationStatus('checking');
+    try { sessionStorage.setItem('mp-location-requested', '1'); } catch { /* Optional session preference. */ }
+    navigator.geolocation.getCurrentPosition(
+      (position) => {
+        const { latitude, longitude } = position.coords;
+        try { sessionStorage.setItem('mp-location-coordinates', JSON.stringify({ latitude, longitude })); } catch { /* Optional session cache. */ }
+        const cacheKey = 'mp-weather-visitor-' + latitude.toFixed(2) + '-' + longitude.toFixed(2);
+        loadWeather(latitude, longitude, cacheKey)
+          .then((data) => { setVisitorWeather(data); setLocationStatus('available'); })
+          .catch(() => { setVisitorWeather(null); setLocationStatus('unavailable'); });
+      },
+      () => setLocationStatus('denied'),
+      { enableHighAccuracy: false, timeout: 7000, maximumAge: 30 * 60 * 1000 }
+    );
+  };
+
   const displayedWeather = visitorWeather ?? businessWeather;
   const kind = useMemo(
     () => displayedWeather ? weatherKind(displayedWeather.icon, displayedWeather.conditions) : 'sun',
@@ -203,7 +230,7 @@ export function WeatherExperience({ children }: { children: ReactNode }) {
   );
 
   return (
-    <WeatherContext.Provider value={{ businessWeather, displayedWeather, visitorWeather, weatherUnavailable }}>
+    <WeatherContext.Provider value={{ businessWeather, displayedWeather, visitorWeather, weatherUnavailable, locationStatus, requestVisitorWeather }}>
       {children}
       {displayedWeather && <WeatherLayer kind={kind} />}
     </WeatherContext.Provider>
@@ -213,7 +240,7 @@ export function WeatherExperience({ children }: { children: ReactNode }) {
 export function WeatherWidget() {
   const weather = useContext(WeatherContext);
   if (!weather) return null;
-  const { businessWeather, visitorWeather, weatherUnavailable } = weather;
+  const { businessWeather, visitorWeather, weatherUnavailable, locationStatus, requestVisitorWeather } = weather;
   const businessKind = businessWeather ? weatherKind(businessWeather.icon, businessWeather.conditions) : 'sun';
 
   return (
@@ -239,8 +266,14 @@ export function WeatherWidget() {
           <span className="inline-flex items-center gap-1"><Wind size={12} /> {Math.round(businessWeather.windspeed)} km/h</span>
         </div>
       )}
-      <div className="mt-2 text-[10px] text-[rgba(248,244,232,0.42)]">
-        Background: {visitorWeather ? 'Your area conditions' : 'Office conditions'} · <a href="https://www.visualcrossing.com/" target="_blank" rel="noreferrer" className="underline underline-offset-2 hover:text-[#D4AF37]">Weather by Visual Crossing</a>
+      <div className="mt-2 flex flex-wrap items-center gap-x-2 gap-y-1 text-[10px] text-[rgba(248,244,232,0.58)]">
+        <span>Background: {visitorWeather ? 'Your area conditions' : 'Office conditions'}</span>
+        {!visitorWeather && locationStatus !== 'checking' && (
+          <button type="button" onClick={requestVisitorWeather} className="underline underline-offset-2 text-[#D4AF37] hover:text-[#FFD700] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#FFD700]">
+            {locationStatus === 'denied' ? 'Enable location in browser settings' : 'Use my local weather'}
+          </button>
+        )}
+        <a href="https://www.visualcrossing.com/" target="_blank" rel="noreferrer" className="underline underline-offset-2 hover:text-[#D4AF37]">Weather by Visual Crossing</a>
       </div>
     </aside>
   );

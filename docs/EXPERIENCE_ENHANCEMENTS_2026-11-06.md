@@ -94,3 +94,5 @@
 - Chrome weather visibility test with simulated rain confirmed z-index 40, screen blend, opacity 0.68, 38 moving rain streaks, 9 glass droplets and a 22°C widget reading.
 - Live browser fetch to the office weather endpoint succeeded (HTTP 200) and returned current Delhi conditions: Clear, 28°C, 30.5°C feels-like, 69.2% humidity and 9.3 km/h wind. This explains why the correct live effect for the office location at test time was clear/sunny rather than rain. Visitor weather still requires the visitor to grant browser location permission; if not granted, the office location is used for the background.
 - Lint, typecheck, Vite production build, PWA service-worker generation and `git diff --check` all passed after these fixes.
+
+- Added an explicit “Use my local weather” action to the weather widget when visitor weather is not available. If browser permission was denied, the control explains that location must be enabled in browser settings; visitors can continue using office weather without granting location.

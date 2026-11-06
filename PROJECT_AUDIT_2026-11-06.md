@@ -168,3 +168,27 @@ Started the first ordered follow-up: accessibility and keyboard support.
 - The June 28 Google key creation date matches the initial Vercel VITE_YOUTUBE_API_KEY setup date, so it is likely the production key; exact key-to-variable fingerprint matching was not performed. Do not apply application restrictions until that mapping is confirmed.
 - Safe target allowlist for the production key should be limited to the verified production hosts (manishaproperties.in, manishaproperties.vercel.app and the Vercel production project alias). Preview-specific key needs its own allowlist including the stable work-branch alias only if preview access is required. Avoid a broad *.vercel.app wildcard.
 - No API key was revealed, copied, rotated, or modified.
+
+
+## Production release — 2026-11-06
+- User explicitly confirmed the 28 June 2026 Google Cloud key "API key 1" is the same key configured as VITE_YOUTUBE_API_KEY.
+- Preview validation completed successfully. A direct promotion request for the preview deployment returned Vercel HTTP 422, so the preview itself was NOT promoted.
+- Correct release path used: created a fresh Vercel production deployment from the exact verified GitHub commit using the Production environment (not Preview environment).
+- Production deployment: dpl_Bfbm4Xw7h6xggtVvw4os8F8y3ZPf, READY, commit fd18633eaf0ffe197f0090945b98616c9a6b81a2.
+- Production aliases now include manishaproperties.in and manishaproperties.vercel.app; Vercel reports both custom project domains verified. The deployment also has its default project alias.
+- Post-deployment Chrome test on https://manishaproperties.in:
+  - /videos page loads and no horizontal overflow at 320px.
+  - Sale 3 videos, Rental 2, Purchased 1, Occupied 0 (expected empty playlist).
+  - API requests all HTTP 200; a captured YouTube API response confirmed 3 Sale items.
+  - Gallery close control 48x48px, dialog opens, and keyboard-origin focus is restored to the Sale tile on close.
+  - /privacy route loads the Privacy Notice, describes Google Analytics and WhatsApp, and has no horizontal overflow.
+  - PWA manifest parses, portrait/landscape orientation is unlocked, Chrome installabilityErrors is empty.
+  - Offline navigation to /privacy renders from service-worker cache.
+  - No JavaScript exceptions observed.
+- Production is now updated to the release candidate code. No rollback was needed.
+- Outstanding security hardening: Google Cloud API key "API key 1" still has Application restrictions = None. The key is API-restricted to YouTube Data API v3. The authenticated Browser connector can read the Google Cloud page but exposes no UI action/write control; the local Mac Chrome profile is not signed into that Google Cloud account. Therefore no application restriction was changed by the agent. This must not be reported as completed.
+- Exact production HTTP referrers to enter under Application restrictions > Websites:
+  1. https://manishaproperties.in/*
+  2. https://manishaproperties.vercel.app/*
+  3. https://manisha-properties-arvireeths-projects.vercel.app/*
+- Do not add broad *.vercel.app wildcards. The preview API key is a separate Vercel Preview-only variable (VITE_YOUTUBE_API_KEY_PREVIEW), so the production key should not be opened to arbitrary preview deployments.

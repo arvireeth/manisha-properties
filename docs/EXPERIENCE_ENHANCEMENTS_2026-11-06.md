@@ -13,6 +13,8 @@
 - Does not hold up page rendering or navigation.
 
 ### 2. Weather-responsive experience
+- Enhanced the visual treatment with layered rain streaks and drifting glass-like droplets, varied snowflake sizes/speeds, soft sunlight glow, moving clouds, fog banks, subtle storm flashes and wind-sweep lines.
+- Added explicit handling for windy and hail conditions in addition to rain, snow, thunder, clouds, fog/haze, sun and clear night.
 - Weather effects are mounted at the application level, so they continue across Home, About, Videos and Privacy routes.
 - When the browser grants geolocation, the background effect follows the visitor's approximate current coordinates.
 - If permission is denied, unavailable or times out, office weather is used as the fallback. Browsing never depends on location access.
@@ -43,6 +45,14 @@
 - No weather API key, paid subscription, new npm dependency, or paid map API was added.
 - Visual Crossing's no-key service is not unlimited and provides no guaranteed service level. If website traffic increases materially, monitor for throttling and reassess rather than assuming unlimited free capacity.
 - OpenStreetMap's public embed/map infrastructure is subject to its usage policies; it is not a guaranteed unlimited tile-hosting service.
+
+## Follow-up weather enhancement validation
+- Rebuilt after visual improvements: lint PASS, typecheck PASS, production build PASS, PWA service worker generation PASS, and `git diff --check` PASS.
+- Simulated cached weather responses in Chrome for rain, snow, thunderstorm, cloudy, fog, sunny, clear-night and windy conditions. Each condition selected the expected CSS layer; rain rendered 38 streaks plus 9 glass droplets, storm 48 streaks plus 12 droplets, snow 42 flakes, and all other weather layers rendered their expected visual elements.
+- Simulated visitor coordinates were reused from session storage after reload without another geolocation request; location data remains session-only and weather cache is browser-local.
+- Responsive document width remained within viewport during weather simulations (no horizontal overflow).
+- Confirmed live Visual Crossing no-key office weather endpoint returned HTTP 200 with current conditions during a direct test.
+- User confirmed saving the exact HTTPS wildcard referrer `https://manisha-properties-g8aaefqbq-arvireeths-projects.vercel.app/*` in Google Cloud website restrictions. The API key remains restricted to YouTube Data API v3 per the user's screenshot. The user should refresh the protected Preview after Google's stated propagation period; the Preview SSO blocked independent interactive browser testing in the authenticated remote test session.
 
 ## Validation performed
 - `npm run lint`: PASS, no warnings.

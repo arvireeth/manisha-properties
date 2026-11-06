@@ -218,3 +218,12 @@ Started the first ordered follow-up: accessibility and keyboard support.
 - Production remains at deployment `dpl_FnVyDy7Y4FXNx9NGjJHm7a9HbZWG`, commit `2621bb447468254485a2b54a7341f25d2ccf8b13` on `main`; no Production deployment or alias change occurred.
 - Local Chrome runtime testing covered the actual built code and responsive viewports; protected Preview route fetches verified HTTP delivery but are not a substitute for interactive browser review on the deployed preview.
 - Production release requires explicit user approval.
+
+
+## Weather visual refinement — 2026-11-06
+- Increased weather detail without new dependencies or paid services: layered rainfall and translucent moving droplets, multi-speed snow, sun glow, moving cloud banks, fog, subtle lightning, and wind-sweep lines. Added wind/hail classification and cloud-sun/moon/wind icons.
+- Fixed visitor-location continuity: granted visitor coordinates are held only in sessionStorage and reused on same-session reloads, avoiding another permission prompt while retaining visitor-area weather. Weather responses remain cached locally for 30 minutes.
+- Simulated eight weather types in Chrome against cached test responses. Correct visual layer and expected particle counts were confirmed; no horizontal overflow.
+- Live no-key Visual Crossing endpoint returned HTTP 200 with current office conditions.
+- User confirmed saving the exact preview referrer pattern `https://manisha-properties-g8aaefqbq-arvireeths-projects.vercel.app/*` in Google Cloud. API restriction remains YouTube Data API v3. Preview interactive testing is still blocked by Vercel SSO in the authenticated test browser; SSO remains enabled.
+- Re-ran lint, typecheck, production build/PWA generation and diff checks successfully after refinement.

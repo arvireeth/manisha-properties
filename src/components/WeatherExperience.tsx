@@ -1,6 +1,6 @@
 import { createContext, useContext, useEffect, useMemo, useState } from 'react';
 import type { ReactNode } from 'react';
-import { CloudDrizzle, CloudFog, CloudLightning, CloudRain, CloudSnow, Droplets, Sun, Wind } from 'lucide-react';
+import { CloudDrizzle, CloudFog, CloudLightning, CloudRain, CloudSnow, CloudSun, Droplets, Moon, Sun, Wind } from 'lucide-react';
 
 type WeatherNow = {
   temp: number;
@@ -52,9 +52,10 @@ async function loadWeather(latitude: number, longitude: number, cacheKey: string
 function weatherKind(icon: string, conditions: string): string {
   const value = `${icon} ${conditions}`.toLowerCase();
   if (value.includes('thunder')) return 'storm';
-  if (value.includes('snow') || value.includes('sleet') || value.includes('ice')) return 'snow';
+  if (value.includes('snow') || value.includes('sleet') || value.includes('ice') || value.includes('hail')) return 'snow';
   if (value.includes('rain') || value.includes('shower') || value.includes('drizzle')) return 'rain';
-  if (value.includes('fog') || value.includes('mist')) return 'fog';
+  if (value.includes('fog') || value.includes('mist') || value.includes('haze')) return 'fog';
+  if (value.includes('wind')) return 'windy';
   if (value.includes('cloud')) return 'cloud';
   if (value.includes('clear-night') || value.includes('night')) return 'night';
   return 'sun';
@@ -66,7 +67,9 @@ function WeatherIcon({ kind, size = 22 }: { kind: string; size?: number }) {
   if (kind === 'snow') return <CloudSnow {...props} />;
   if (kind === 'rain') return <CloudRain {...props} />;
   if (kind === 'fog') return <CloudFog {...props} />;
-  if (kind === 'cloud') return <CloudDrizzle {...props} />;
+  if (kind === 'cloud') return <CloudSun {...props} />;
+  if (kind === 'windy') return <Wind {...props} />;
+  if (kind === 'night') return <Moon {...props} />;
   return <Sun {...props} />;
 }
 
@@ -102,14 +105,18 @@ function WeatherLayer({ kind }: { kind: string }) {
   if (kind === 'cloud') {
     return <div className="weather-layer weather-cloud" aria-hidden="true"><span /><span /><span /></div>;
   }
-  if (kind === 'fog') {
-    return <div className="weather-layer weather-fog" aria-hidden="true"><span /><span /><span /></div>;
+  if (kind === 'fog' || kind === 'windy') {
+    return <div className={`weather-layer weather-${kind}`} aria-hidden="true"><span /><span /><span /><span /></div>;
   }
-  const drops = Array.from({ length: kind === 'storm' ? 34 : 24 }, (_, index) => index);
+  const drops = Array.from({ length: kind === 'storm' ? 48 : kind === 'snow' ? 42 : 38 }, (_, index) => index);
+  const glassDrops = Array.from({ length: kind === 'storm' ? 12 : 9 }, (_, index) => index);
   return (
     <div className={`weather-layer weather-${kind}`} aria-hidden="true">
       {drops.map((drop) => (
-        <i key={drop} style={{ left: `${(drop * 37) % 100}%`, animationDelay: `${(drop % 13) * -0.37}s`, animationDuration: `${0.8 + (drop % 5) * 0.16}s` }} />
+        <i key={drop} style={{ left: `${(drop * 37) % 100}%`, animationDelay: `${(drop % 13) * -0.37}s`, animationDuration: `${kind === 'snow' ? 5 + (drop % 7) * 1.4 : 0.72 + (drop % 6) * 0.19}s`, opacity: 0.35 + (drop % 5) * 0.12, ...(kind === 'snow' ? { width: `${3 + (drop % 4)}px`, height: `${3 + (drop % 4)}px` } : {}) }} />
+      ))}
+      {(kind === 'rain' || kind === 'storm') && glassDrops.map((drop) => (
+        <b key={`glass-${drop}`} style={{ left: `${(drop * 61 + 8) % 100}%`, top: `${(drop * 29 + 7) % 86 + 5}%`, animationDelay: `${drop * -1.7}s`, animationDuration: `${9 + (drop % 4) * 2}s` }} />
       ))}
       {kind === 'snow' && <span className="snow-glow" />}
     </div>
@@ -132,20 +139,36 @@ export function WeatherExperience({ children }: { children: ReactNode }) {
     };
     refreshBusinessWeather();
 
+    const loadVisitorWeather = (latitude: number, longitude: number) => {
+      visitorCoordinates = { latitude, longitude };
+      const cacheKey = 'mp-weather-visitor-' + latitude.toFixed(2) + '-' + longitude.toFixed(2);
+      loadWeather(latitude, longitude, cacheKey)
+        .then((data) => { if (active) setVisitorWeather(data); })
+        .catch(() => { if (active) setVisitorWeather(null); });
+    };
+
     let locationAlreadyRequested = false;
-    try { locationAlreadyRequested = sessionStorage.getItem('mp-location-requested') === '1'; } catch { /* Continue with office weather. */ }
-    if (!locationAlreadyRequested) {
+    let savedCoordinates: { latitude: number; longitude: number } | null = null;
+    try {
+      locationAlreadyRequested = sessionStorage.getItem('mp-location-requested') === '1';
+      const saved = sessionStorage.getItem('mp-location-coordinates');
+      if (saved) {
+        const parsed = JSON.parse(saved) as { latitude: number; longitude: number };
+        if (Number.isFinite(parsed.latitude) && Number.isFinite(parsed.longitude)) savedCoordinates = parsed;
+      }
+    } catch { /* Continue with office weather. */ }
+
+    if (savedCoordinates) {
+      loadVisitorWeather(savedCoordinates.latitude, savedCoordinates.longitude);
+    } else if (!locationAlreadyRequested) {
       try { sessionStorage.setItem('mp-location-requested', '1'); } catch { /* Do not block browsing. */ }
       if ('geolocation' in navigator) {
         navigator.geolocation.getCurrentPosition(
           (position) => {
             if (!active) return;
             const { latitude, longitude } = position.coords;
-            visitorCoordinates = { latitude, longitude };
-            const cacheKey = 'mp-weather-visitor-' + latitude.toFixed(2) + '-' + longitude.toFixed(2);
-            loadWeather(latitude, longitude, cacheKey)
-              .then((data) => { if (active) setVisitorWeather(data); })
-              .catch(() => { if (active) setVisitorWeather(null); });
+            try { sessionStorage.setItem('mp-location-coordinates', JSON.stringify({ latitude, longitude })); } catch { /* Session-only cache is optional. */ }
+            loadVisitorWeather(latitude, longitude);
           },
           () => { if (active) setVisitorWeather(null); },
           { enableHighAccuracy: false, timeout: 7000, maximumAge: 30 * 60 * 1000 }

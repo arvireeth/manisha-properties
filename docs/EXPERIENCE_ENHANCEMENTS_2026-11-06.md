@@ -96,3 +96,12 @@
 - Lint, typecheck, Vite production build, PWA service-worker generation and `git diff --check` all passed after these fixes.
 
 - Added an explicit “Use my local weather” action to the weather widget when visitor weather is not available. If browser permission was denied, the control explains that location must be enabled in browser settings; visitors can continue using office weather without granting location.
+
+
+## Temperature unit and final QA continuation
+- Added an accessible Celsius/Fahrenheit toggle to the office weather widget. Celsius remains the default; both the main temperature and feels-like reading switch together. Conversion is performed locally and introduces no additional API calls or dependencies.
+- Chrome production-build verification used a controlled cached weather reading of 20.5°C / 21.2°C feels-like. The widget rendered 21°C, then 21°F with a matching 70°F feels-like reading after the toggle.
+- Rechecked the interactive office map iframe and Google Maps directions link in the built app. Both were present.
+- Responsive Chrome checks at 320, 390, 768 and 1440 CSS px reported document widths of 320, 390, 762 and 1434 px respectively; no horizontal overflow.
+- Updated About and Videos sitemap `lastmod` values to 2026-11-06 to reflect the application-wide experience updates.
+- Validation after the unit toggle: lint PASS, TypeScript PASS, Vite build/PWA generation PASS, `git diff --check` PASS.

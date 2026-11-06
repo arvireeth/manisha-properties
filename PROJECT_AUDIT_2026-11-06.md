@@ -239,3 +239,12 @@ Started the first ordered follow-up: accessibility and keyboard support.
 - Revalidated lint, typecheck, build/PWA generation and diff checks successfully.
 
 - Added an explicit visitor-location retry/action to the weather widget. When location is unavailable, visitors can choose “Use my local weather”; when browser permission is denied, the widget explains that permission must be enabled in browser settings. Office weather remains the no-permission fallback.
+
+
+## Continued experience QA — 2026-11-06
+- Added accessible Celsius/Fahrenheit control to the office weather widget. Celsius is default; feels-like and main temperature use the same selected unit. Conversion is local, with no additional network call.
+- Chrome built-app test with controlled weather values: 20.5°C displayed as 21°C; toggle displayed 21°F and 70°F feels-like.
+- Confirmed the interactive OpenStreetMap iframe and Google Maps directions link are present in the Home page build.
+- Responsive widths 320/390/768/1440 CSS px: document width 320/390/762/1434 respectively; no horizontal overflow.
+- Updated stale About and Videos sitemap lastmod values to 2026-11-06 for the global experience changes.
+- Re-ran lint, typecheck, production build/PWA generation and diff checks successfully.

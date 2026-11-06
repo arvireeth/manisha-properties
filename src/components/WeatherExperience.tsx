@@ -73,8 +73,9 @@ function WeatherIcon({ kind, size = 22 }: { kind: string; size?: number }) {
   return <Sun {...props} />;
 }
 
-function AnimatedTemperature({ value }: { value: number }) {
-  const target = Math.round(value);
+function AnimatedTemperature({ value, unit }: { value: number; unit: 'C' | 'F' }) {
+  const converted = unit === 'F' ? (value * 9) / 5 + 32 : value;
+  const target = Math.round(converted);
   const [displayed, setDisplayed] = useState(target);
   const currentValue = useRef(target);
 
@@ -101,7 +102,7 @@ function AnimatedTemperature({ value }: { value: number }) {
     return () => window.cancelAnimationFrame(frame);
   }, [target]);
 
-  return <span className="weather-temperature gold-text" aria-label={`${target} degrees Celsius`}>{displayed}°C</span>;
+  return <span className="weather-temperature gold-text" aria-label={`${target} degrees ${unit === 'C' ? 'Celsius' : 'Fahrenheit'}`}>{displayed}°{unit}</span>;
 }
 
 function WeatherLayer({ kind }: { kind: string }) {
@@ -239,6 +240,7 @@ export function WeatherExperience({ children }: { children: ReactNode }) {
 
 export function WeatherWidget() {
   const weather = useContext(WeatherContext);
+  const [temperatureUnit, setTemperatureUnit] = useState<'C' | 'F'>('C');
   if (!weather) return null;
   const { businessWeather, visitorWeather, weatherUnavailable, locationStatus, requestVisitorWeather } = weather;
   const businessKind = businessWeather ? weatherKind(businessWeather.icon, businessWeather.conditions) : 'sun';
@@ -251,7 +253,8 @@ export function WeatherWidget() {
           <div className="text-[10px] uppercase tracking-[0.16em] text-[rgba(248,244,232,0.55)]">Office weather · Moti Nagar</div>
           {businessWeather ? (
             <div className="flex items-baseline gap-2">
-              <AnimatedTemperature value={businessWeather.temp} />
+              <AnimatedTemperature value={businessWeather.temp} unit={temperatureUnit} />
+              <button type="button" onClick={() => setTemperatureUnit((unit) => unit === 'C' ? 'F' : 'C')} aria-label={`Switch to degrees ${temperatureUnit === 'C' ? 'Fahrenheit' : 'Celsius'}`} className="rounded border border-[rgba(212,175,55,0.28)] px-1.5 py-0.5 text-[10px] font-semibold text-[#D4AF37] hover:bg-[rgba(212,175,55,0.12)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#FFD700]">°{temperatureUnit === 'C' ? 'F' : 'C'}</button>
               <span className="text-xs text-[rgba(248,244,232,0.7)]">{businessWeather.conditions}</span>
             </div>
           ) : (
@@ -261,7 +264,7 @@ export function WeatherWidget() {
       </div>
       {businessWeather && (
         <div className="mt-3 flex flex-wrap gap-x-4 gap-y-1 text-[11px] text-[rgba(248,244,232,0.58)]">
-          <span className="inline-flex items-center gap-1"><CloudDrizzle size={12} /> Feels {Math.round(businessWeather.feelslike)}°</span>
+          <span className="inline-flex items-center gap-1"><CloudDrizzle size={12} /> Feels {Math.round(temperatureUnit === 'F' ? (businessWeather.feelslike * 9) / 5 + 32 : businessWeather.feelslike)}°{temperatureUnit}</span>
           <span className="inline-flex items-center gap-1"><Droplets size={12} /> {Math.round(businessWeather.humidity)}% humidity</span>
           <span className="inline-flex items-center gap-1"><Wind size={12} /> {Math.round(businessWeather.windspeed)} km/h</span>
         </div>

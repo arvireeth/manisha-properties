@@ -40,16 +40,20 @@ function Footer() {
                 href="https://www.youtube.com/@ManishaProperties"
                 target="_blank"
                 rel="noopener noreferrer"
+                aria-label="Visit Manisha Properties on YouTube"
+                title="Visit Manisha Properties on YouTube"
                 className="p-2.5 rounded-lg bg-[rgba(212,175,55,0.1)] border border-[rgba(212,175,55,0.25)] text-[#D4AF37] hover:bg-[rgba(212,175,55,0.2)] transition-all"
               >
-                <Youtube size={18} />
+                <Youtube size={18} aria-hidden="true" />
               </a>
 
               <a
                 href="tel:8700204768"
+                aria-label="Call Manisha Properties at +91 87002 04768"
+                title="Call Manisha Properties"
                 className="p-2.5 rounded-lg bg-[rgba(212,175,55,0.1)] border border-[rgba(212,175,55,0.25)] text-[#D4AF37] hover:bg-[rgba(212,175,55,0.2)] transition-all"
               >
-                <Phone size={18} />
+                <Phone size={18} aria-hidden="true" />
               </a>
             </div>
           </div>

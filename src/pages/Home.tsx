@@ -332,8 +332,13 @@ function Home() {
 
                   <div className="relative glass-card-strong p-2 max-w-sm w-full mx-auto">
                     <img
-                      src="/images/Manisha_Properties_visiting_card.webp"
-                      alt="Manisha Properties Real Estate Consultant Delhi NCR"
+                      src="/images/Manisha_Properties_visiting_card-640.webp"
+                      alt="Manisha Properties visiting card with real estate consulting contact details"
+                      width={640}
+                      height={960}
+                      fetchPriority="high"
+                      loading="eager"
+                      decoding="async"
                       className="w-full rounded-xl object-contain"
                     />
                   </div>

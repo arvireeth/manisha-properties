@@ -330,16 +330,18 @@ function Home() {
                   <div className="absolute inset-0 rounded-2xl bg-[rgba(212,175,55,0.15)] blur-3xl scale-110" />
                   <div className="absolute inset-0 rounded-2xl border border-[rgba(212,175,55,0.2)] animate-pulse-gold" />
 
-                  <div className="relative glass-card-strong p-2 max-w-sm w-full mx-auto">
+                  <div className="relative glass-card-strong p-2 max-w-sm w-full mx-auto aspect-[2/3]">
                     <img
                       src="/images/Manisha_Properties_visiting_card-640.webp"
+                      srcSet="/images/Manisha_Properties_visiting_card-400.webp 400w, /images/Manisha_Properties_visiting_card-640.webp 640w"
+                      sizes="(max-width: 640px) calc(100vw - 32px), 366px"
                       alt="Manisha Properties visiting card with real estate consulting contact details"
                       width={640}
                       height={960}
                       fetchPriority="high"
                       loading="eager"
                       decoding="async"
-                      className="w-full rounded-xl object-contain"
+                      className="h-full w-full rounded-xl object-contain"
                     />
                   </div>
                 </div>

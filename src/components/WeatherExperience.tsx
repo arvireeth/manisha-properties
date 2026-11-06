@@ -254,7 +254,7 @@ export function WeatherWidget() {
           {businessWeather ? (
             <div className="flex items-baseline gap-2">
               <AnimatedTemperature value={businessWeather.temp} unit={temperatureUnit} />
-              <button type="button" onClick={() => setTemperatureUnit((unit) => unit === 'C' ? 'F' : 'C')} aria-label={`Switch to degrees ${temperatureUnit === 'C' ? 'Fahrenheit' : 'Celsius'}`} className="rounded border border-[rgba(212,175,55,0.28)] px-1.5 py-0.5 text-[10px] font-semibold text-[#D4AF37] hover:bg-[rgba(212,175,55,0.12)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#FFD700]">°{temperatureUnit === 'C' ? 'F' : 'C'}</button>
+              <button type="button" onClick={() => setTemperatureUnit((unit) => unit === 'C' ? 'F' : 'C')} aria-label={`°${temperatureUnit === 'C' ? 'F' : 'C'} — Switch to degrees ${temperatureUnit === 'C' ? 'Fahrenheit' : 'Celsius'}`} className="rounded border border-[rgba(212,175,55,0.28)] px-1.5 py-0.5 text-[10px] font-semibold text-[#D4AF37] hover:bg-[rgba(212,175,55,0.12)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#FFD700]">°{temperatureUnit === 'C' ? 'F' : 'C'}</button>
               <span className="text-xs text-[rgba(248,244,232,0.7)]">{businessWeather.conditions}</span>
             </div>
           ) : (

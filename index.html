@@ -91,6 +91,20 @@
       content="https://manishaproperties.in/images/Logo.jpg"
     />
 
+    <!-- Prioritize the responsive hero image before the React app hydrates. -->
+    <link
+      rel="preload"
+      as="image"
+      href="/images/Manisha_Properties_visiting_card-640.webp"
+      imagesrcset="/images/Manisha_Properties_visiting_card-400.webp 400w, /images/Manisha_Properties_visiting_card-640.webp 640w"
+      imagesizes="(max-width: 640px) calc(100vw - 32px), 366px"
+      fetchpriority="high"
+    />
+
+    <!-- Preload the Latin font files used in the first viewport to reduce font-swap layout shifts. -->
+    <link rel="preload" as="font" type="font/woff2" href="https://fonts.gstatic.com/s/inter/v20/UcC73FwrK3iLTeHuS_nVMrMxCp50SjIa1ZL7W0Q5nw.woff2" crossorigin />
+    <link rel="preload" as="font" type="font/woff2" href="https://fonts.gstatic.com/s/playfairdisplay/v40/nuFiD-vYSZviVYUb_rj3ij__anPXDTzYgEM86xQ.woff2" crossorigin />
+
     <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />
 

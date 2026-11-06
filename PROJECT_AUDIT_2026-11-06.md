@@ -147,3 +147,14 @@ Started the first ordered follow-up: accessibility and keyboard support.
 - Latest RC2 build: lint PASS (no warnings), TypeScript PASS, Vite production build PASS, git diff --check PASS.
 - Chrome confirmed first Tab reaches the skip link; Enter moves focus to #main-content. On mobile, the navigation target exists and is hidden while closed, opens with aria-expanded=true, and closes on Escape with aria-expanded=false.
 - Home, About, Videos and Privacy routes again passed 390px Chrome rendering with no horizontal overflow.
+
+
+## Preview deployment and release protection — 2026-11-06
+- Release-candidate branch is pushed and clean: work/manisha-release-candidate-2026-11-06.
+- Commits: c4a000b (main implementation/accessibility/privacy/PWA/image optimization) and 2bc5878 (skip link and stable mobile navigation target).
+- Latest Vercel preview deployment for commit 2bc5878: READY, URL https://manisha-properties-nyaaef2be-arvireeths-projects.vercel.app; target is preview (not production).
+- Prior preview for c4a000b is also READY: https://manisha-properties-r2xdjk2da-arvireeths-projects.vercel.app.
+- Vercel SSO protection is enabled for preview deployments. Chrome navigation to the preview redirects to Vercel login. The Vercel fetch integration returned HTTP 200 for the preview Privacy route, but full live-browser interaction of the protected preview awaits an authenticated Vercel browser session. Protection was not disabled and no bypass secret was generated.
+- Production deployment remains unchanged: READY commit 21ff3c69 on feature/pwa-installable-app, aliases include manishaproperties.in.
+- Latest local branch has no uncommitted changes; dist remains ignored and untracked by Git.
+- Outstanding authenticated checks: Google Cloud Console sign-in required to inspect YouTube API key HTTP-referrer/API restrictions; Vercel sign-in required for Chrome to exercise the protected preview itself.

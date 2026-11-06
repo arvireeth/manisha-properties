@@ -7,6 +7,7 @@ import Footer from "./components/Footer";
 import ShareContact from "./components/ShareContact";
 import OpeningIntro from "./components/OpeningIntro";
 import { WeatherExperience } from "./components/WeatherExperience";
+import AnalyticsConsent from "./components/AnalyticsConsent";
 
 import Home from "./pages/Home";
 import { About } from "./pages/About";
@@ -55,6 +56,7 @@ function App() {
 
       <Footer />
       <ShareContact />
+      <AnalyticsConsent />
     </div>
     </WeatherExperience>
   );

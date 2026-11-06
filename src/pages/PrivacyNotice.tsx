@@ -45,7 +45,8 @@ function PrivacyNotice() {
             <p className="mt-3">
               The property enquiry form lets you select your requirement and
               optionally enter a preferred location and approximate budget.
-              These entries remain in the page until you choose
+              These entries are used to prepare a WhatsApp message and remain
+              in the page until you choose
               <strong className="text-[#F8F4E8]"> Continue on WhatsApp</strong>.
               That action opens WhatsApp with a pre-filled message addressed
               to Manisha Properties. Review it before sending. The website
@@ -64,13 +65,28 @@ function PrivacyNotice() {
               Website analytics
             </h2>
             <p className="mt-3">
-              This website currently uses Google Analytics (measurement ID
-              G-0B88R2EHR4) to understand website usage and improve the site.
-              Google Analytics may use cookies or similar technologies and
-              process technical and interaction information, such as pages
-              viewed and device/browser information. Google's processing is
-              subject to Google's own terms and privacy information.
+              Optional Google Analytics is loaded only if you select
+              “Allow analytics” in the website privacy-choice notice. If you
+              reject optional analytics, the Analytics tag is not loaded by
+              this website. If you accept, Google Analytics may use cookies or
+              similar technologies and process technical and interaction
+              information such as page views, browser/device information, and
+              clicks on phone, WhatsApp and property-video links. The website
+              does not send enquiry text, names, email addresses, phone
+              numbers, or the location and budget entries from the enquiry
+              form as Analytics event data. Google's processing is subject to
+              Google's own terms and privacy information.
             </p>
+            <p className="mt-3">
+              You can change your choice at any time using the control below.
+            </p>
+            <button
+              type="button"
+              onClick={() => window.dispatchEvent(new Event('mp:manage-analytics'))}
+              className="btn-glass mt-3 min-h-10 px-4 text-sm"
+            >
+              Review analytics choice
+            </button>
             <p className="mt-3">
               Learn more in Google's
               {' '}

@@ -163,18 +163,8 @@ function Home() {
               latitude: '28.660133',
               longitude: '77.153424',
             },
-            openingHours: [
-              'Mo-Su 10:00-19:00',
-            ],
-            founder: {
-              '@type': 'Person',
-              name: 'Manisha Gupta',
-            },
-            foundingDate: '2015',
             description:
-              'Trusted DLF Authorized Channel Partner providing property buying, selling, rental, investment consulting and property management services.',
-            slogan: 'Trusted DLF Authorized Channel Partner',
-            priceRange: '₹₹',
+              'Real estate property buying, selling, rental and property management services in Moti Nagar and Delhi NCR.',
             makesOffer: [
               {
                 '@type': 'Offer',

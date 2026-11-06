@@ -192,3 +192,18 @@ Started the first ordered follow-up: accessibility and keyboard support.
   2. https://manishaproperties.vercel.app/*
   3. https://manisha-properties-arvireeths-projects.vercel.app/*
 - Do not add broad *.vercel.app wildcards. The preview API key is a separate Vercel Preview-only variable (VITE_YOUTUBE_API_KEY_PREVIEW), so the production key should not be opened to arbitrary preview deployments.
+
+
+## Experience enhancement phase — 2026-11-06 (local implementation)
+- Created isolated branch `work/manisha-experience-enhancements-2026-11-06` from verified release checkpoint `2621bb4`. No push or deployment has been performed.
+- Added a session-scoped, skippable logo introduction; automatically disabled for reduced-motion users.
+- Added application-level weather backdrop so conditions persist across all site routes. Visitor geolocation is requested once per browser session; denied/unavailable permission falls back to office weather.
+- Added animated office temperature/conditions widget on Home for DLF Capital Greens coordinates 28.6601, 77.1534, including feels-like, humidity and wind speed.
+- Added weather states for sun, cloud, rain, snow, thunderstorm, fog and clear night. Effects are pointer-transparent and reduced-motion aware.
+- Added interactive OpenStreetMap embed, pulsing office marker, larger-map link and Google Maps directions link using coordinates; no paid Maps API or API key.
+- Updated Privacy Notice with location/weather provider disclosure and user controls.
+- Licensing review: Open-Meteo free API is non-commercial only and was rejected for this commercial property website. Visual Crossing's official 28 Oct 2026 documentation says its anonymous no-key Weather API permits commercial applications without subscription subject to fair-use controls and attribution. No fixed anonymous request allowance or SLA is guaranteed; 30-minute browser caching is implemented and traffic should be monitored. Sources: https://www.visualcrossing.com/resources/documentation/weather-api/free-weather-api-no-key/ and https://www.visualcrossing.com/resources/documentation/what-can-i-do-with-the-visual-crossing-weather-free-plan/.
+- Validation: lint PASS; typecheck PASS; production build PASS; git diff --check PASS. Local production-mode Chrome tests verified intro lifecycle, simulated visitor geolocation/weather, business temperature, weather backdrop persistence on Videos route, reduced-motion behaviour, Privacy Notice disclosure, and no horizontal overflow at 320/390/768/1440 CSS px. No runtime exceptions observed. Weather and OSM endpoints both returned HTTP 200.
+- Limitations: real physical-device GPS/permission testing, every weather effect under live conditions, full Lighthouse/accessibility audit, authenticated Vercel Preview testing, and exact office entrance pin confirmation remain outstanding.
+- Production safeguards: production deployment/configuration/aliases/API keys unchanged. No push, Preview deployment or Production deployment performed. Production release requires explicit user approval.
+- Detailed implementation and test record: `docs/EXPERIENCE_ENHANCEMENTS_2026-11-06.md`.

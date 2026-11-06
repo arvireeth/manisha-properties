@@ -5,6 +5,8 @@ import { useLayoutEffect } from "react";
 import Navbar from "./components/Navbar";
 import Footer from "./components/Footer";
 import ShareContact from "./components/ShareContact";
+import OpeningIntro from "./components/OpeningIntro";
+import { WeatherExperience } from "./components/WeatherExperience";
 
 import Home from "./pages/Home";
 import { About } from "./pages/About";
@@ -30,8 +32,10 @@ function ScrollToTop() {
 
 function App() {
   return (
+    <WeatherExperience>
     <div className="min-h-screen flex flex-col">
       <ScrollToTop />
+      <OpeningIntro />
       <a
         href="#main-content"
         className="sr-only z-[200] rounded-md bg-[#FFD700] px-4 py-3 font-semibold text-[#100D08] focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:outline-none focus:ring-4 focus:ring-white"
@@ -52,6 +56,7 @@ function App() {
       <Footer />
       <ShareContact />
     </div>
+    </WeatherExperience>
   );
 }
 

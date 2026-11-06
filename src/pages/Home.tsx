@@ -18,6 +18,7 @@ import { useYouTube, YOUTUBE_PLAYLISTS } from '../hooks/useYouTube';
 import { VideoCard } from '../components/VideoCard';
 import { useNavigate } from 'react-router-dom';
 import WhatsAppEnquiry from '../components/WhatsAppEnquiry';
+import { WeatherWidget } from '../components/WeatherExperience';
 
 const services = [
   { icon: HomeIcon, label: 'Sale', desc: 'Premium property sale listings across Delhi NCR' },
@@ -312,6 +313,8 @@ function Home() {
                   </a>
                 </div>
 
+                <WeatherWidget />
+
                 {/* Stats Row */}
                 <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 pt-4">
                   {stats.map(({ value, label }) => (
@@ -509,6 +512,33 @@ function Home() {
                 </button>
               </div>
             )}
+          </div>
+        </section>
+
+        {/* Visit our office — interactive OpenStreetMap */}
+        <section className="py-20 px-4 sm:px-6 lg:px-8">
+          <div className="max-w-7xl mx-auto grid lg:grid-cols-[0.85fr_1.15fr] gap-10 items-center">
+            <div className="space-y-5">
+              <p className="text-xs text-[rgba(212,175,55,0.7)] uppercase tracking-widest font-medium">Visit Our Office</p>
+              <h2 className="font-serif text-3xl sm:text-4xl font-bold"><span className="text-[#F8F4E8]">Find Us </span><span className="gold-text">in Delhi</span></h2>
+              <div className="gold-divider max-w-[120px]" />
+              <a href="https://www.google.com/maps/dir/?api=1&destination=28.660133%2C77.153424" target="_blank" rel="noopener noreferrer" className="group inline-flex items-start gap-3 text-[rgba(248,244,232,0.78)] hover:text-[#FFD700] transition-colors">
+                <MapPin size={20} className="mt-1 shrink-0 text-[#D4AF37]" />
+                <span className="leading-relaxed">Block 3, Ground Floor, CSP Unit No-1<br />DLF Capital Greens, Moti Nagar<br />New Delhi, Delhi 110015<br /><span className="text-sm text-[#D4AF37] underline underline-offset-4">Open directions</span></span>
+              </a>
+              <p className="text-sm text-[rgba(248,244,232,0.5)]">Explore the map, zoom in and move around to find our office entrance.</p>
+            </div>
+            <div className="office-map-shell glass-card-strong">
+              <div className="office-map-marker" aria-hidden="true"><span /></div>
+              <iframe
+                title="Manisha Properties office map at DLF Capital Greens, Moti Nagar"
+                src="https://www.openstreetmap.org/export/embed.html?bbox=77.1434%2C28.6540%2C77.1634%2C28.6662&layer=mapnik&marker=28.660133%2C77.153424"
+                loading="lazy"
+                referrerPolicy="no-referrer-when-downgrade"
+                className="office-map-frame"
+              />
+              <div className="office-map-caption"><span>Manisha Properties · DLF Capital Greens</span><a href="https://www.openstreetmap.org/?mlat=28.660133&mlon=77.153424#map=17/28.660133/77.153424" target="_blank" rel="noopener noreferrer">View larger map</a></div>
+            </div>
           </div>
         </section>
 

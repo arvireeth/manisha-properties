@@ -207,3 +207,14 @@ Started the first ordered follow-up: accessibility and keyboard support.
 - Limitations: real physical-device GPS/permission testing, every weather effect under live conditions, full Lighthouse/accessibility audit, authenticated Vercel Preview testing, and exact office entrance pin confirmation remain outstanding.
 - Production safeguards: production deployment/configuration/aliases/API keys unchanged. No push, Preview deployment or Production deployment performed. Production release requires explicit user approval.
 - Detailed implementation and test record: `docs/EXPERIENCE_ENHANCEMENTS_2026-11-06.md`.
+
+
+## Experience enhancement preview deployment — 2026-11-06
+- Enhancement branch `work/manisha-experience-enhancements-2026-11-06` was pushed separately from the production branch.
+- Initial implementation commit: `cde92d5406689447c0fa689e28020348d1135a72`.
+- Vercel Preview deployment `dpl_FnhrMCpp1GNUfDF6wMRbj8KrUbdH` reached READY at `https://manisha-properties-27cpbhyqg-arvireeths-projects.vercel.app`.
+- Authenticated Vercel fetch returned HTTP 200 for `/`, `/about`, `/videos`, `/privacy`, `/manifest.webmanifest` and `/sw.js`. The deployed JS bundle contains the weather, animated intro, office map and privacy-disclosure code.
+- Preview protection remains enabled (`all_except_custom_domains`). No access protection setting or bypass secret was changed.
+- Production remains at deployment `dpl_FnVyDy7Y4FXNx9NGjJHm7a9HbZWG`, commit `2621bb447468254485a2b54a7341f25d2ccf8b13` on `main`; no Production deployment or alias change occurred.
+- Local Chrome runtime testing covered the actual built code and responsive viewports; protected Preview route fetches verified HTTP delivery but are not a substitute for interactive browser review on the deployed preview.
+- Production release requires explicit user approval.

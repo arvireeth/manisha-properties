@@ -139,3 +139,11 @@ Started the first ordered follow-up: accessibility and keyboard support.
 - Existing Google Cloud Console session was not authenticated (redirected to Google sign-in). YouTube API key referrer/API restrictions therefore remain unverified. No key values were displayed or changed.
 - Vercel CLI was not available locally; an npx CLI bootstrap attempt did not complete and was stopped. No preview deployment was created from the uncommitted local changes.
 - Vercel account records still show production on commit 21ff3c6 of feature/pwa-installable-app. No production aliases, settings or deployments were modified.
+
+
+### Additional accessibility pass — 2026-11-06
+- Added a visible-on-focus "Skip to main content" link and a programmatically focusable main landmark.
+- Mobile navigation menu now remains present in the DOM while hidden, so aria-controls always references an existing target. The expanded state and Escape dismissal were retested in Chrome.
+- Latest RC2 build: lint PASS (no warnings), TypeScript PASS, Vite production build PASS, git diff --check PASS.
+- Chrome confirmed first Tab reaches the skip link; Enter moves focus to #main-content. On mobile, the navigation target exists and is hidden while closed, opens with aria-expanded=true, and closes on Escape with aria-expanded=false.
+- Home, About, Videos and Privacy routes again passed 390px Chrome rendering with no horizontal overflow.

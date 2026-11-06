@@ -32,9 +32,15 @@ function App() {
   return (
     <div className="min-h-screen flex flex-col">
       <ScrollToTop />
+      <a
+        href="#main-content"
+        className="sr-only z-[200] rounded-md bg-[#FFD700] px-4 py-3 font-semibold text-[#100D08] focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:outline-none focus:ring-4 focus:ring-white"
+      >
+        Skip to main content
+      </a>
       <Navbar />
 
-      <main className="flex-1">
+      <main id="main-content" tabIndex={-1} className="flex-1 focus:outline-none">
         <Routes>
           <Route path="/" element={<Home />} />
           <Route path="/about" element={<About />} />

@@ -120,11 +120,11 @@ function Navbar() {
 
       {/* Mobile Menu */}
 
-      {menuOpen && (
-        <div
-          id="mobile-navigation-menu"
-          className="md:hidden bg-[rgba(10,8,5,0.97)] border-t border-[rgba(212,175,55,0.15)]"
-        >
+      <div
+        id="mobile-navigation-menu"
+        hidden={!menuOpen}
+        className="md:hidden bg-[rgba(10,8,5,0.97)] border-t border-[rgba(212,175,55,0.15)]"
+      >
           {navItems.map((item) => (
             <Link
               key={item.path}
@@ -147,8 +147,7 @@ function Navbar() {
           >
             Call: 8700204768
           </a>
-        </div>
-      )}
+      </div>
     </nav>
   );
 }

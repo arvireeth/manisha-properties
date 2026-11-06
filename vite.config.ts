@@ -24,8 +24,8 @@ export default defineConfig({
         description: 'Explore properties and real estate services from Manisha Properties.',
         theme_color: '#D4AF37',
         background_color: '#F8F5EC',
+        display_override: ['window-controls-overlay', 'standalone'],
         display: 'standalone',
-        orientation: 'portrait',
         scope: '/',
         start_url: '/',
         icons: [
@@ -54,6 +54,7 @@ export default defineConfig({
           /^\/$/,
           /^\/about\/?$/,
           /^\/videos\/?$/,
+          /^\/privacy\/?$/,
         ],
         cleanupOutdatedCaches: true,
       },

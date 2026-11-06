@@ -20,6 +20,19 @@
   }
 }
 
+/* Use Chrome's desktop PWA window-controls overlay when supported. */
+@media (display-mode: window-controls-overlay) {
+  .app-navbar {
+    padding-top: env(titlebar-area-height, 0px);
+    -webkit-app-region: drag;
+  }
+
+  .app-navbar a,
+  .app-navbar button {
+    -webkit-app-region: no-drag;
+  }
+}
+
 @layer components {
   .glass-card {
     background: rgba(255, 255, 255, 0.06);
@@ -129,6 +142,21 @@
   .nav-link:hover::after,
   .nav-link.active::after {
     width: 100%;
+  }
+
+  /* Gallery cards respond to the modal's actual content width, not the
+     browser viewport. This prevents cramped two-column cards in narrow PWAs. */
+  .video-gallery-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 320px), 1fr));
+    gap: 1rem;
+    align-items: start;
+  }
+
+  @media (min-width: 640px) {
+    .video-gallery-grid {
+      gap: 1.25rem;
+    }
   }
 
   .video-card {

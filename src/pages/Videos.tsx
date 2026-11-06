@@ -1,5 +1,5 @@
 
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { Helmet } from 'react-helmet-async';
 import {
   Youtube,
@@ -78,36 +78,35 @@ function PlaylistVideos({ playlist }: { playlist: Playlist }) {
   }, [loading, refresh]);
 
   return (
-    <div className="min-w-0">
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-6">
-        <div>
+    <div className="min-w-0 w-full">
+      <div className="mb-6 grid grid-cols-1 gap-4 md:grid-cols-[minmax(0,1fr)_auto] md:items-start">
+        <div className="min-w-0">
           <span className="text-xs uppercase tracking-[0.2em] text-[#D4AF37] font-semibold">
             Manisha Properties
           </span>
-          <h3 className="font-serif text-2xl sm:text-3xl font-bold text-[#F8F4E8] mt-2">
+          <h3 className="font-serif text-2xl sm:text-3xl font-bold text-[#F8F4E8] mt-2 break-words">
             {playlist.title} Videos
           </h3>
           <p className="text-sm text-[rgba(248,244,232,0.6)] mt-2">
             Explore our latest {playlist.title.toLowerCase()} property videos.
           </p>
         </div>
-      <div className="flex justify-end mb-5">
-        <button
-           type="button"
-           onClick={refresh}
-           disabled={loading}
-           className="btn-glass inline-flex items-center gap-2 text-sm disabled:opacity-50"
-     >
-         <span className={loading ? 'animate-spin' : ''}>↻</span>
-         {loading ? 'Refreshing...' : 'Refresh Videos'}
-      </button>
-     </div>
-
-        {videos.length > 0 && (
-          <span className="self-start sm:self-center rounded-full border border-[#D4AF37]/30 bg-[#D4AF37]/10 px-3 py-1.5 text-xs text-[#D4AF37]">
-            {videos.length} loaded
-          </span>
-        )}
+        <div className="flex flex-wrap items-center justify-start md:justify-end gap-3 min-w-0">
+          <button
+            type="button"
+            onClick={refresh}
+            disabled={loading}
+            className="btn-glass inline-flex min-h-11 items-center justify-center gap-2 text-sm whitespace-nowrap disabled:opacity-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#FFD700] focus-visible:ring-offset-2 focus-visible:ring-offset-[#17110B]"
+          >
+            <span className={loading ? 'animate-spin' : ''}>↻</span>
+            {loading ? 'Refreshing...' : 'Refresh Videos'}
+          </button>
+          {videos.length > 0 && (
+            <span className="rounded-full border border-[#D4AF37]/30 bg-[#D4AF37]/10 px-3 py-1.5 text-xs text-[#D4AF37]">
+              {videos.length} loaded
+            </span>
+          )}
+        </div>
       </div>
 
       {loading && videos.length === 0 && (
@@ -142,7 +141,7 @@ function PlaylistVideos({ playlist }: { playlist: Playlist }) {
 
       {videos.length > 0 && (
         <>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+          <div className="video-gallery-grid">
             {videos.map((video) => (
               <VideoCard key={video.id.videoId} video={video} />
             ))}
@@ -182,31 +181,81 @@ function PlaylistModal({
   onSelect: (playlist: Playlist) => void;
   onClose: () => void;
 }) {
+  const dialogRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const previouslyFocused =
+      document.activeElement instanceof HTMLElement
+        ? document.activeElement
+        : null;
+
+    const focusableSelector =
+      'a[href], button:not([disabled]), [tabindex]:not([tabindex="-1"])';
+
+    dialogRef.current
+      ?.querySelector<HTMLElement>('[aria-label="Close video gallery"]')
+      ?.focus();
+
+    const handleFocusTrap = (event: KeyboardEvent) => {
+      if (event.key !== 'Tab' || !dialogRef.current) return;
+
+      const focusable = Array.from(
+        dialogRef.current.querySelectorAll<HTMLElement>(focusableSelector)
+      ).filter((element) => element.offsetWidth > 0 || element.offsetHeight > 0);
+
+      if (focusable.length === 0) {
+        event.preventDefault();
+        dialogRef.current.focus();
+        return;
+      }
+
+      const first = focusable[0];
+      const last = focusable[focusable.length - 1];
+
+      if (event.shiftKey && document.activeElement === first) {
+        event.preventDefault();
+        last.focus();
+      } else if (!event.shiftKey && document.activeElement === last) {
+        event.preventDefault();
+        first.focus();
+      }
+    };
+
+    document.addEventListener('keydown', handleFocusTrap);
+
+    return () => {
+      document.removeEventListener('keydown', handleFocusTrap);
+      previouslyFocused?.focus();
+    };
+  }, []);
+
   return (
     <div
-      className="fixed inset-0 z-[100] flex items-center justify-center bg-black/85 backdrop-blur-md p-2 sm:p-5"
+      className="fixed inset-0 z-[100] flex items-center justify-center bg-black/90 backdrop-blur-md p-2 sm:p-4 md:p-5"
       onClick={onClose}
     >
       <div
         role="dialog"
         aria-modal="true"
         aria-labelledby="playlist-modal-title"
-        className="relative flex flex-col w-full max-w-6xl max-h-[94vh] overflow-hidden rounded-2xl sm:rounded-3xl border border-[#D4AF37]/40 bg-[#17110B] shadow-2xl shadow-black/60"
+        ref={dialogRef}
+        tabIndex={-1}
+        className="relative flex min-h-0 flex-col w-full max-w-6xl max-h-[calc(100vh-1rem)] max-h-[calc(100dvh-1rem)] overflow-hidden rounded-xl sm:rounded-2xl md:rounded-3xl border border-[#D4AF37]/50 bg-[#17110B] shadow-2xl shadow-black/60"
         onClick={(event) => event.stopPropagation()}
       >
-        <header className="shrink-0 border-b border-[#D4AF37]/20 bg-[#1D160D] px-4 py-4 sm:px-7 sm:py-5">
-          <div className="flex items-start justify-between gap-4">
-            <div>
-              <span className="text-[10px] sm:text-xs uppercase tracking-[0.22em] text-[#D4AF37] font-semibold">
+        <header className="shrink-0 border-b border-[#D4AF37]/20 bg-[#1D160D] px-3 py-3 sm:px-6 sm:py-5">
+          <div className="flex min-w-0 items-start justify-between gap-3">
+            <div className="min-w-0 flex-1">
+              <span className="text-[10px] sm:text-xs uppercase tracking-[0.18em] sm:tracking-[0.22em] text-[#D4AF37] font-semibold">
                 Manisha Properties
               </span>
               <h2
                 id="playlist-modal-title"
-                className="font-serif text-2xl sm:text-3xl font-bold text-[#F8F4E8] mt-1"
+                className="font-serif text-xl sm:text-3xl font-bold leading-tight text-[#F8F4E8] mt-1 break-words"
               >
                 Property Video Gallery
               </h2>
-              <p className="text-xs sm:text-sm text-white/55 mt-1">
+              <p className="text-xs sm:text-sm text-white/65 mt-1">
                 Explore our property videos by category.
               </p>
             </div>
@@ -215,14 +264,15 @@ function PlaylistModal({
               type="button"
               onClick={onClose}
               aria-label="Close video gallery"
-              className="shrink-0 w-10 h-10 rounded-full border border-[#D4AF37]/40 bg-[#D4AF37]/10 text-[#D4AF37] flex items-center justify-center hover:bg-[#D4AF37] hover:text-black transition-colors"
+              title="Close gallery"
+              className="relative z-10 grid h-12 w-12 sm:h-12 sm:w-12 shrink-0 place-items-center rounded-full border-2 border-[#FFE58A] bg-[#FFD700] text-[#17110B] shadow-[0_0_0_3px_rgba(255,215,0,0.18),0_4px_18px_rgba(0,0,0,0.55)] hover:bg-[#FFF0A8] hover:border-white active:scale-95 focus:outline-none focus-visible:ring-4 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-[#1D160D] transition-all"
             >
-              <X size={22} />
+              <X size={25} strokeWidth={3} />
             </button>
           </div>
 
           <div
-            className="flex gap-2 overflow-x-auto mt-5 pb-1"
+            className="flex gap-2 overflow-x-auto overscroll-x-contain mt-5 pb-2 -mb-1"
             role="tablist"
             aria-label="Property video categories"
           >
@@ -234,8 +284,34 @@ function PlaylistModal({
                   key={item.title}
                   type="button"
                   role="tab"
+                  id={`playlist-tab-${item.title.toLowerCase()}`}
+                  aria-controls="playlist-videos-panel"
                   aria-selected={active}
+                  tabIndex={active ? 0 : -1}
                   onClick={() => onSelect(item)}
+                  onKeyDown={(event) => {
+                    const tabs = Array.from(
+                      event.currentTarget.parentElement?.querySelectorAll<HTMLButtonElement>('[role="tab"]') ?? []
+                    );
+                    const currentIndex = tabs.indexOf(event.currentTarget);
+                    let nextIndex = currentIndex;
+
+                    if (event.key === 'ArrowRight') {
+                      nextIndex = (currentIndex + 1) % tabs.length;
+                    } else if (event.key === 'ArrowLeft') {
+                      nextIndex = (currentIndex - 1 + tabs.length) % tabs.length;
+                    } else if (event.key === 'Home') {
+                      nextIndex = 0;
+                    } else if (event.key === 'End') {
+                      nextIndex = tabs.length - 1;
+                    } else {
+                      return;
+                    }
+
+                    event.preventDefault();
+                    tabs[nextIndex]?.focus();
+                    onSelect(playlists[nextIndex]);
+                  }}
                   className={`shrink-0 rounded-full px-5 py-2.5 text-sm font-semibold border transition-all ${
                     active
                       ? 'bg-[#D4AF37] text-[#17110B] border-[#D4AF37] shadow-lg shadow-[#D4AF37]/10'
@@ -250,7 +326,11 @@ function PlaylistModal({
         </header>
 
         <div
-          className="flex-1 min-h-0 overflow-y-auto overscroll-contain p-4 sm:p-7"
+          id="playlist-videos-panel"
+          role="tabpanel"
+          aria-labelledby={`playlist-tab-${playlist.title.toLowerCase()}`}
+          tabIndex={0}
+          className="flex-1 min-h-0 min-w-0 overflow-y-auto overscroll-contain p-3 sm:p-4 md:p-6 lg:p-7 focus:outline-none"
           key={playlist.playlistId}
         >
           <PlaylistVideos
@@ -259,15 +339,15 @@ function PlaylistModal({
           />
         </div>
 
-        <footer className="shrink-0 border-t border-white/10 bg-[#1D160D] px-4 py-3 sm:px-7">
-          <div className="flex items-center justify-between gap-3">
+        <footer className="shrink-0 border-t border-white/10 bg-[#1D160D] px-3 py-3 sm:px-5 md:px-7">
+          <div className="flex flex-wrap items-center justify-between gap-2">
             <span className="text-[11px] sm:text-xs text-white/40">
               Manisha Properties · Delhi NCR
             </span>
             <button
               type="button"
               onClick={onClose}
-              className="text-xs sm:text-sm font-semibold text-[#D4AF37] hover:text-white transition-colors"
+              className="min-h-10 inline-flex items-center rounded-md px-3 text-xs sm:text-sm font-semibold text-[#FFD700] hover:bg-[#D4AF37]/15 hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#FFD700] focus-visible:ring-offset-2 focus-visible:ring-offset-[#1D160D] transition-colors"
             >
               Close Gallery
             </button>

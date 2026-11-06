@@ -27,7 +27,7 @@ export function VideoCard({ video }: VideoCardProps) {
       href={youtubeUrl}
       target="_blank"
       rel="noopener noreferrer"
-      className="video-card glass-card border border-[rgba(212,175,55,0.15)] group block"
+      className="video-card glass-card min-w-0 border border-[rgba(212,175,55,0.15)] group block focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#FFD700] focus-visible:ring-offset-2 focus-visible:ring-offset-[#17110B]"
     >
       {/* Thumbnail */}
       <div className="relative overflow-hidden" style={{ paddingBottom: '56.25%' }}>

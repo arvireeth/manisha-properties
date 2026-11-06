@@ -1,5 +1,5 @@
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import QRCode from "qrcode";
 import {
   Share2,
@@ -20,6 +20,57 @@ function ShareContact() {
   const [isOpen, setIsOpen] = useState(false);
   const [websiteQR, setWebsiteQR] = useState("");
   const [copied, setCopied] = useState(false);
+  const dialogRef = useRef<HTMLDivElement>(null);
+  const triggerRef = useRef<HTMLButtonElement>(null);
+
+  useEffect(() => {
+    if (!isOpen) return;
+
+    const trigger = triggerRef.current;
+    const focusableSelector =
+      'a[href], button:not([disabled]), [tabindex]:not([tabindex="-1"])';
+
+    dialogRef.current
+      ?.querySelector<HTMLElement>('[aria-label="Close share panel"]')
+      ?.focus();
+
+    const handleDialogKeys = (event: KeyboardEvent) => {
+      if (event.key === "Escape") {
+        setIsOpen(false);
+        return;
+      }
+
+      if (event.key !== "Tab" || !dialogRef.current) return;
+
+      const focusable = Array.from(
+        dialogRef.current.querySelectorAll<HTMLElement>(focusableSelector)
+      ).filter((element) => element.offsetWidth > 0 || element.offsetHeight > 0);
+
+      if (focusable.length === 0) {
+        event.preventDefault();
+        dialogRef.current.focus();
+        return;
+      }
+
+      const first = focusable[0];
+      const last = focusable[focusable.length - 1];
+
+      if (event.shiftKey && document.activeElement === first) {
+        event.preventDefault();
+        last.focus();
+      } else if (!event.shiftKey && document.activeElement === last) {
+        event.preventDefault();
+        first.focus();
+      }
+    };
+
+    document.addEventListener("keydown", handleDialogKeys);
+
+    return () => {
+      document.removeEventListener("keydown", handleDialogKeys);
+      trigger?.focus();
+    };
+  }, [isOpen]);
 
   useEffect(() => {
     let cancelled = false;
@@ -136,18 +187,20 @@ function ShareContact() {
     <>
       {isOpen && (
         <div
-          className="fixed inset-0 z-[90] bg-black/60 backdrop-blur-sm"
+          className="fixed inset-0 z-[70] bg-black/60 backdrop-blur-sm"
           onClick={() => setIsOpen(false)}
           aria-hidden="true"
         />
       )}
 
-      <div className="fixed bottom-6 right-5 z-[100] flex flex-col items-end gap-3">
+      <div className="fixed bottom-6 right-5 z-[80] flex flex-col items-end gap-3">
         {isOpen && (
           <div
             role="dialog"
             aria-modal="true"
             aria-label="Share Manisha Properties"
+            ref={dialogRef}
+            tabIndex={-1}
             className="w-[min(340px,calc(100vw-40px))] max-h-[75vh] overflow-y-auto rounded-2xl border border-[#D4AF37]/40 bg-[#100D08] p-5 text-[#F8F4E8] shadow-2xl"
           >
             <div className="mb-4 flex items-center justify-between">
@@ -272,6 +325,8 @@ function ShareContact() {
         )}
 
         <button
+          ref={triggerRef}
+          type="button"
           onClick={() => setIsOpen(!isOpen)}
           aria-label={isOpen ? "Close share options" : "Open share options"}
           aria-expanded={isOpen}

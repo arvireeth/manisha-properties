@@ -16,6 +16,21 @@ function Navbar() {
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
+  useEffect(() => {
+    setMenuOpen(false);
+  }, [location.pathname]);
+
+  useEffect(() => {
+    if (!menuOpen) return;
+
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === "Escape") setMenuOpen(false);
+    };
+
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [menuOpen]);
+
   const navItems = [
     { label: "Home", path: "/" },
     { label: "Property Videos", path: "/videos" },
@@ -24,7 +39,8 @@ function Navbar() {
 
   return (
     <nav
-      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 ${
+      aria-label="Primary navigation"
+      className={`app-navbar fixed top-0 left-0 right-0 z-50 transition-all duration-500 ${
         scrolled
           ? "bg-[rgba(10,8,5,0.92)] backdrop-blur-xl border-b border-[rgba(212,175,55,0.2)] shadow-[0_4px_30px_rgba(0,0,0,0.5)]"
           : "bg-transparent"
@@ -63,6 +79,7 @@ function Navbar() {
               <Link
                 key={item.path}
                 to={item.path}
+                aria-current={location.pathname === item.path ? "page" : undefined}
                 className={`nav-link text-sm tracking-wide transition-colors ${
                   location.pathname === item.path
                     ? "text-[#D4AF37]"
@@ -89,8 +106,12 @@ function Navbar() {
           {/* Mobile Button */}
 
           <button
+            type="button"
             onClick={() => setMenuOpen(!menuOpen)}
-            className="md:hidden p-2 text-[#D4AF37]"
+            aria-label={menuOpen ? "Close navigation menu" : "Open navigation menu"}
+            aria-expanded={menuOpen}
+            aria-controls="mobile-navigation-menu"
+            className="md:hidden p-2 text-[#D4AF37] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#FFD700] focus-visible:ring-offset-2 focus-visible:ring-offset-[#100D08]"
           >
             {menuOpen ? <X size={22} /> : <Menu size={22} />}
           </button>
@@ -100,11 +121,15 @@ function Navbar() {
       {/* Mobile Menu */}
 
       {menuOpen && (
-        <div className="md:hidden bg-[rgba(10,8,5,0.97)] border-t border-[rgba(212,175,55,0.15)]">
+        <div
+          id="mobile-navigation-menu"
+          className="md:hidden bg-[rgba(10,8,5,0.97)] border-t border-[rgba(212,175,55,0.15)]"
+        >
           {navItems.map((item) => (
             <Link
               key={item.path}
               to={item.path}
+              aria-current={location.pathname === item.path ? "page" : undefined}
               onClick={() => setMenuOpen(false)}
               className={`block px-5 py-4 ${
                 location.pathname === item.path

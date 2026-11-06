@@ -300,7 +300,7 @@ export function About() {
                 <div className="absolute -inset-4 rounded-3xl bg-[rgba(212,175,55,0.10)] blur-3xl" />
                 <div className="relative glass-card-strong p-3">
                   <img
-                    src="/images/Manisha_Properties_visiting_card.PNG"
+                    src="/images/Manisha_Properties_visiting_card.webp"
                     alt="Manisha Properties Business Card"
                     className="w-full rounded-xl object-contain"
                   />

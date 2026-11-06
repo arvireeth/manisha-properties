@@ -339,7 +339,7 @@ function Home() {
 
                   <div className="relative glass-card-strong p-2 max-w-sm w-full mx-auto">
                     <img
-                      src="/images/Manisha_Properties_visiting_card.PNG"
+                      src="/images/Manisha_Properties_visiting_card.webp"
                       alt="Manisha Properties Real Estate Consultant Delhi NCR"
                       className="w-full rounded-xl object-contain"
                     />

@@ -25,7 +25,7 @@
 ### 3. Animated office temperature
 - The Home page shows current office conditions for DLF Capital Greens, Moti Nagar (28.6601, 77.1534).
 - Shows temperature in Celsius, conditions, feels-like temperature, humidity and wind speed.
-- Temperature numerals count up on load/update.
+- Temperature numerals animate smoothly when readings change and render the actual current reading immediately on first display (no zero-value flash or background-tab animation dependency).
 - Weather responses are cached in browser storage for 30 minutes and refreshed no more frequently than the cache interval while the page remains open.
 - Visible attribution links to Visual Crossing Weather.
 
@@ -49,7 +49,7 @@
 ## Follow-up weather enhancement validation
 - Rebuilt after visual improvements: lint PASS, typecheck PASS, production build PASS, PWA service worker generation PASS, and `git diff --check` PASS.
 - Simulated cached weather responses in Chrome for rain, snow, thunderstorm, cloudy, fog, sunny, clear-night and windy conditions. Each condition selected the expected CSS layer; rain rendered 38 streaks plus 9 glass droplets, storm 48 streaks plus 12 droplets, snow 42 flakes, and all other weather layers rendered their expected visual elements.
-- Simulated visitor coordinates were reused from session storage after reload without another geolocation request; location data remains session-only and weather cache is browser-local.
+- Simulated visitor coordinates were reused from session storage after reload without another geolocation request; location data remains session-only and weather cache is browser-local. A follow-up Chrome test verified the live office reading rendered as 29°C (the provider returned 28.5°C) rather than remaining at the animation starting value.
 - Responsive document width remained within viewport during weather simulations (no horizontal overflow).
 - Confirmed live Visual Crossing no-key office weather endpoint returned HTTP 200 with current conditions during a direct test.
 - User confirmed saving the exact HTTPS wildcard referrer `https://manisha-properties-g8aaefqbq-arvireeths-projects.vercel.app/*` in Google Cloud website restrictions. The API key remains restricted to YouTube Data API v3 per the user's screenshot. The user should refresh the protected Preview after Google's stated propagation period; the Preview SSO blocked independent interactive browser testing in the authenticated remote test session.

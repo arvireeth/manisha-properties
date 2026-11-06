@@ -1,4 +1,4 @@
-import { createContext, useContext, useEffect, useMemo, useState } from 'react';
+import { createContext, useContext, useEffect, useMemo, useRef, useState } from 'react';
 import type { ReactNode } from 'react';
 import { CloudDrizzle, CloudFog, CloudLightning, CloudRain, CloudSnow, CloudSun, Droplets, Moon, Sun, Wind } from 'lucide-react';
 
@@ -74,28 +74,34 @@ function WeatherIcon({ kind, size = 22 }: { kind: string; size?: number }) {
 }
 
 function AnimatedTemperature({ value }: { value: number }) {
-  const [displayed, setDisplayed] = useState(0);
+  const target = Math.round(value);
+  const [displayed, setDisplayed] = useState(target);
+  const currentValue = useRef(target);
 
   useEffect(() => {
     if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
-      setDisplayed(Math.round(value));
+      currentValue.current = target;
+      setDisplayed(target);
       return;
     }
 
+    const startValue = currentValue.current;
+    if (startValue === target) return;
     let frame = 0;
     let startTime = 0;
-    const target = Math.round(value);
     const animate = (now: number) => {
       if (!startTime) startTime = now;
       const progress = Math.min((now - startTime) / 850, 1);
-      setDisplayed(Math.round(target * (1 - Math.pow(1 - progress, 3))));
+      const next = Math.round(startValue + (target - startValue) * (1 - Math.pow(1 - progress, 3)));
+      currentValue.current = next;
+      setDisplayed(next);
       if (progress < 1) frame = window.requestAnimationFrame(animate);
     };
     frame = window.requestAnimationFrame(animate);
     return () => window.cancelAnimationFrame(frame);
-  }, [value]);
+  }, [target]);
 
-  return <span className="weather-temperature gold-text" aria-label={`${Math.round(value)} degrees Celsius`}>{displayed}°C</span>;
+  return <span className="weather-temperature gold-text" aria-label={`${target} degrees Celsius`}>{displayed}°C</span>;
 }
 
 function WeatherLayer({ kind }: { kind: string }) {

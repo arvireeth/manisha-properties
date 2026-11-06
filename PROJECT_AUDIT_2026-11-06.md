@@ -227,3 +227,6 @@ Started the first ordered follow-up: accessibility and keyboard support.
 - Live no-key Visual Crossing endpoint returned HTTP 200 with current office conditions.
 - User confirmed saving the exact preview referrer pattern `https://manisha-properties-g8aaefqbq-arvireeths-projects.vercel.app/*` in Google Cloud. API restriction remains YouTube Data API v3. Preview interactive testing is still blocked by Vercel SSO in the authenticated test browser; SSO remains enabled.
 - Re-ran lint, typecheck, production build/PWA generation and diff checks successfully after refinement.
+
+- Follow-up QA fixed the temperature counter's initial zero-value state: it now initializes from the actual weather reading and animates only subsequent changes. Live Chrome check showed 29°C, matching the provider's 28.5°C rounded reading.
+- Latest Preview branch alias is `manisha-properties-git-work-manisha-948bbc-arvireeths-projects.vercel.app`; this is preferable to one-off deployment hostnames for persistent API-key referrer allowlisting.

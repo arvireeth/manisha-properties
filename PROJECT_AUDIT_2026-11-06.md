@@ -248,3 +248,11 @@ Started the first ordered follow-up: accessibility and keyboard support.
 - Responsive widths 320/390/768/1440 CSS px: document width 320/390/762/1434 respectively; no horizontal overflow.
 - Updated stale About and Videos sitemap lastmod values to 2026-11-06 for the global experience changes.
 - Re-ran lint, typecheck, production build/PWA generation and diff checks successfully.
+
+## Preview release and weather matrix verification — 2026-11-06
+- Latest code commit `bb0e1525e647f28589d4c005a8cbbae322b87d88` deployed to Vercel Preview deployment `dpl_8gd5kLAQRFBHBx8sbUs2wSpsPfuf`, state READY. Stable alias: `https://manisha-properties-git-work-manisha-948bbc-arvireeths-projects.vercel.app`.
+- Vercel authenticated fetch: HTTP 200 for Home, About, Videos, Privacy, PWA manifest, service worker, sitemap and robots.txt. JS and CSS assets retrieved successfully. Preview SSO remains enabled.
+- Local Chrome simulated all eight weather types (clear, partly cloudy, rain, snow, thunderstorm, fog, windy, clear night); all mapped to the expected layer. Rain 38 streaks/9 droplets, snow 42 flakes, storm 48 streaks/12 droplets.
+- Celsius/Fahrenheit toggle and feels-like conversion verified in Chrome. Office map iframe and Google Maps directions anchor verified. Responsive document width did not exceed viewport at 320/390/768/1440px.
+- `npm audit --omit=dev`: zero production dependency vulnerabilities.
+- No production deployment, alias, environment variable, API key, Vercel protection or branch setting was modified.

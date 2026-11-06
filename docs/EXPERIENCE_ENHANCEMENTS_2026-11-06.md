@@ -105,3 +105,13 @@
 - Responsive Chrome checks at 320, 390, 768 and 1440 CSS px reported document widths of 320, 390, 762 and 1434 px respectively; no horizontal overflow.
 - Updated About and Videos sitemap `lastmod` values to 2026-11-06 to reflect the application-wide experience updates.
 - Validation after the unit toggle: lint PASS, TypeScript PASS, Vite build/PWA generation PASS, `git diff --check` PASS.
+
+## Preview release checkpoint — 6 November 2026
+- Latest implementation commit: `bb0e1525e647f28589d4c005a8cbbae322b87d88` (`Add temperature unit toggle and complete experience QA`).
+- Vercel Preview deployment: `dpl_8gd5kLAQRFBHBx8sbUs2wSpsPfuf`, state READY; stable branch alias `https://manisha-properties-git-work-manisha-948bbc-arvireeths-projects.vercel.app`.
+- Vercel fetch verified HTTP 200 for `/`, `/about`, `/videos`, `/privacy`, `/manifest.webmanifest`, `/sw.js`, `/sitemap.xml` and `/robots.txt`. Preview SSO remains enabled.
+- Deployed JS/CSS assets were retrieved successfully; bundle contains the C/F toggle and CSS contains the corrected weather overlay stacking.
+- Local built-app Chrome simulation passed all eight weather states: clear, partly cloudy, rain, snow, thunderstorm, fog, windy and clear night. Rain rendered 38 streaks and 9 droplets; snow 42 flakes; storm 48 streaks and 12 droplets.
+- Temperature toggle verified: 20.5°C -> 21°C; 21.2°C feels-like -> 70°F after switching to Fahrenheit. Office map iframe and directions link verified.
+- Production dependency audit: `npm audit --omit=dev` reported zero vulnerabilities.
+- Current production aliases, deployment and environment configuration were not changed. Preview SSO was not disabled. No Production deployment was requested or performed.

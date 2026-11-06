@@ -52,3 +52,9 @@ No Google Cloud project or key settings were changed. A valid replacement YouTub
 - Local preview performance and accessibility scores are strong.
 - The latest changes are for Preview only. Production deployment was not promoted.
 - Do not release until the YouTube API key is renewed and the playlist flow is verified.
+
+### Preview versus production API key verification
+- The local `.env.production.local` key is expired (HTTP 400: `API key expired. Please renew the API key.`). This local key was not committed.
+- The public production bundle's key is valid when the request referrer is `https://manishaproperties.in/`; YouTube API checks returned HTTP 200 for Sale, Rental, and Purchased. Occupied returned HTTP 200 with zero items for the one-item check.
+- The current Vercel Preview bundle's key returns HTTP 403: `Requests from referer https://manisha-properties-bv25dl3vm-arvireeths-projects.vercel.app/ are blocked.` This is an HTTP-referrer restriction, not an invalid playlist ID.
+- To validate dynamic playlists in Preview, the Google Cloud owner must add the stable Vercel branch alias `https://manisha-properties-git-work-manisha-948bbc-arvireeths-projects.vercel.app/*` (and optionally the current unique preview hostname) to the Preview key's allowed HTTP referrers. Keep the production key's restrictions scoped to the production domain.

@@ -230,3 +230,10 @@ Started the first ordered follow-up: accessibility and keyboard support.
 
 - Follow-up QA fixed the temperature counter's initial zero-value state: it now initializes from the actual weather reading and animates only subsequent changes. Live Chrome check showed 29°C, matching the provider's 28.5°C rounded reading.
 - Latest Preview branch alias is `manisha-properties-git-work-manisha-948bbc-arvireeths-projects.vercel.app`; this is preferable to one-off deployment hostnames for persistent API-key referrer allowlisting.
+
+
+## First-paint and weather-visibility correction — 2026-11-06
+- Fixed opening intro flash/order: visibility is determined during the initial React render rather than post-paint `useEffect`; logo image receives high fetch priority. Chrome confirmed the intro exists on the first rendered frame and clears after its display interval.
+- Fixed weather overlay stacking: moved from z-index 0 (behind content/stacking contexts) to z-index 40, screen-blended, pointer-events none, with stronger translucent particles. Simulated rain displayed 38 streaks and 9 droplets with expected CSS animation.
+- Current office live weather endpoint tested directly in Chrome: HTTP 200, Clear, 28°C. Thus the office location should not display rain at the time of this check. Visitor-location weather depends on permission; otherwise office weather is the fallback.
+- Revalidated lint, typecheck, build/PWA generation and diff checks successfully.

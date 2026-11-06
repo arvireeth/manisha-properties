@@ -85,3 +85,12 @@
 - Preview deployment for initial implementation commit `cde92d5406689447c0fa689e28020348d1135a72` reached READY at `https://manisha-properties-27cpbhyqg-arvireeths-projects.vercel.app`. Vercel authenticated fetch returned HTTP 200 for Home, About, Videos, Privacy, manifest and service worker. The deployed JS bundle was checked for the weather, map, intro and privacy features.
 - Vercel preview SSO protection remains enabled (`all_except_custom_domains`); no protection setting or bypass secret was changed. The local production-mode Chrome test remains the interactive runtime verification because the Vercel fetch action retrieves deployment responses rather than driving a browser.
 - Any final code/documentation updates will produce a newer Preview; explicit user approval remains required before Production release.
+
+
+## Follow-up visibility and first-paint correction
+- Root cause for the delayed logo: the intro initially rendered hidden and only became visible in a post-paint `useEffect`. It now determines session/reduced-motion eligibility in the initial state initializer, so the logo overlay is part of the first React render. The logo image is marked high fetch priority.
+- Root cause for the weak weather effect: the fixed overlay used `z-index: 0`, allowing it to sit behind page content/stacking contexts. It now uses a non-interactive, screen-blended foreground overlay at `z-index: 40`, with stronger but still translucent condition-specific opacity and clearer rain/snow particles. Navigation/modal interaction remains unaffected because the layer uses `pointer-events: none`.
+- Chrome first-render test confirmed the intro is present immediately with z-index 1000. After its 1.85-second display, the intro is removed while the weather layer remains mounted.
+- Chrome weather visibility test with simulated rain confirmed z-index 40, screen blend, opacity 0.68, 38 moving rain streaks, 9 glass droplets and a 22°C widget reading.
+- Live browser fetch to the office weather endpoint succeeded (HTTP 200) and returned current Delhi conditions: Clear, 28°C, 30.5°C feels-like, 69.2% humidity and 9.3 km/h wind. This explains why the correct live effect for the office location at test time was clear/sunny rather than rain. Visitor weather still requires the visitor to grant browser location permission; if not granted, the office location is used for the background.
+- Lint, typecheck, Vite production build, PWA service-worker generation and `git diff --check` all passed after these fixes.

@@ -1,19 +1,27 @@
 import { useEffect, useState } from 'react';
 
+function shouldShowIntro() {
+  if (typeof window === 'undefined') return false;
+  if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return false;
+  try {
+    if (sessionStorage.getItem('mp-intro-seen') === '1') return false;
+    sessionStorage.setItem('mp-intro-seen', '1');
+  } catch {
+    // If session storage is unavailable, still show the intro for this mount.
+  }
+  return true;
+}
+
 export default function OpeningIntro() {
-  const [visible, setVisible] = useState(false);
+  // Decide during the first render, not in useEffect. This prevents the page
+  // painting first and the logo overlay appearing a frame or two later.
+  const [visible, setVisible] = useState(shouldShowIntro);
 
   useEffect(() => {
-    const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-    let seen = false;
-    try { seen = sessionStorage.getItem('mp-intro-seen') === '1'; } catch { /* Continue without session storage. */ }
-    if (seen || reducedMotion) return;
-
-    setVisible(true);
-    try { sessionStorage.setItem('mp-intro-seen', '1'); } catch { /* Intro still works for this render. */ }
-    const timeout = window.setTimeout(() => setVisible(false), 1750);
+    if (!visible) return;
+    const timeout = window.setTimeout(() => setVisible(false), 1850);
     return () => window.clearTimeout(timeout);
-  }, []);
+  }, [visible]);
 
   if (!visible) return null;
 
@@ -21,7 +29,7 @@ export default function OpeningIntro() {
     <div className="opening-intro" role="status" aria-label="Welcome to Manisha Properties">
       <div className="opening-intro-content">
         <div className="opening-logo-ring">
-          <img src="/images/Logo.jpg" alt="" className="opening-logo" />
+          <img src="/images/Logo.jpg" alt="" className="opening-logo" fetchPriority="high" />
         </div>
         <div className="opening-brand">Manisha Properties</div>
         <div className="opening-tagline">Advisors &amp; Consultants</div>

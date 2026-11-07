@@ -1,41 +1,34 @@
 import { useEffect, useState } from 'react';
 
-function shouldShowIntro() {
+// Android supplies a native splash from the manifest. iOS needs a startup
+// image and a short in-app handoff after the WebKit view becomes available.
+function isIosStandalone() {
   if (typeof window === 'undefined') return false;
-  if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return false;
-  try {
-    if (sessionStorage.getItem('mp-intro-seen') === '1') return false;
-    sessionStorage.setItem('mp-intro-seen', '1');
-  } catch {
-    // If session storage is unavailable, still show the intro for this mount.
-  }
-  return true;
+  return /iPad|iPhone|iPod/.test(navigator.userAgent) &&
+    (window.matchMedia('(display-mode: standalone)').matches ||
+      (navigator as Navigator & { standalone?: boolean }).standalone === true);
 }
 
 export default function OpeningIntro() {
-  // Decide during the first render, not in useEffect. This prevents the page
-  // painting first and the logo overlay appearing a frame or two later.
-  const [visible, setVisible] = useState(shouldShowIntro);
+  const [visible, setVisible] = useState(isIosStandalone);
 
   useEffect(() => {
     if (!visible) return;
-    const timeout = window.setTimeout(() => setVisible(false), 1850);
+    const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const timeout = window.setTimeout(() => setVisible(false), reducedMotion ? 500 : 1100);
     return () => window.clearTimeout(timeout);
   }, [visible]);
 
   if (!visible) return null;
 
   return (
-    <div className="opening-intro" role="status" aria-label="Welcome to Manisha Properties">
-      <div className="opening-intro-content">
-        <div className="opening-logo-ring">
-          <img src="/images/Logo.jpg" alt="" className="opening-logo" fetchPriority="high" />
-        </div>
-        <div className="opening-brand">Manisha Properties</div>
-        <div className="opening-tagline">Advisors &amp; Consultants</div>
-        <div className="opening-rule" />
-      </div>
-      <button type="button" className="opening-skip" onClick={() => setVisible(false)}>Skip intro</button>
+    <div className="opening-intro" role="status" aria-label="Manisha Properties is opening">
+      <img
+        src="/icons/gold-logo-512.png"
+        alt="Manisha Properties"
+        className="opening-logo"
+        fetchPriority="high"
+      />
     </div>
   );
 }

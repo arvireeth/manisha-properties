@@ -1,6 +1,6 @@
 
 import { Routes, Route, useLocation } from "react-router-dom";
-import { useLayoutEffect } from "react";
+import { useEffect, useLayoutEffect, useState } from "react";
 
 import Navbar from "./components/Navbar";
 import Footer from "./components/Footer";
@@ -12,6 +12,8 @@ import Home from "./pages/Home";
 import { About } from "./pages/About";
 import { Videos } from "./pages/Videos";
 import PrivacyNotice from "./pages/PrivacyNotice";
+
+import InstallApp, { type InstallPrompt } from "./pages/InstallApp";
 
 function ScrollToTop() {
   const { pathname } = useLocation();
@@ -31,6 +33,22 @@ function ScrollToTop() {
 }
 
 function App() {
+  const [installPrompt, setInstallPrompt] = useState<InstallPrompt | null>(null);
+
+  useEffect(() => {
+    const capturePrompt = (event: Event) => {
+      event.preventDefault();
+      setInstallPrompt(event as InstallPrompt);
+    };
+    const clearPrompt = () => setInstallPrompt(null);
+    window.addEventListener('beforeinstallprompt', capturePrompt);
+    window.addEventListener('appinstalled', clearPrompt);
+    return () => {
+      window.removeEventListener('beforeinstallprompt', capturePrompt);
+      window.removeEventListener('appinstalled', clearPrompt);
+    };
+  }, []);
+
   return (
     <WeatherExperience>
     <div className="min-h-screen flex flex-col">
@@ -48,6 +66,7 @@ function App() {
           <Route path="/" element={<Home />} />
           <Route path="/about" element={<About />} />
           <Route path="/videos" element={<Videos />} />
+          <Route path="/install" element={<InstallApp prompt={installPrompt} clearPrompt={() => setInstallPrompt(null)} />} />
           <Route path="/privacy" element={<PrivacyNotice />} />
         </Routes>
       </main>

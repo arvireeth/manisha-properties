@@ -53,7 +53,7 @@ export default defineConfig({
         // Workbox matches the pathname and query string together.
         navigateFallbackAllowlist: [
           /^\/(?:\?.*)?$/,
-          /^\/(?:about|videos|privacy)\/?(?:\?.*)?$/,
+          /^\/(?:about|videos|privacy|install)\/?(?:\?.*)?$/,
         ],
         cleanupOutdatedCaches: true,
       },

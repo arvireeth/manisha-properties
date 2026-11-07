@@ -195,12 +195,18 @@ function Footer() {
             Consultants. All rights reserved.
           </div>
 
-          <div className="flex items-center gap-4">
+          <div className="flex flex-wrap items-center gap-4">
             <Link
               to="/privacy"
               className="text-xs text-[rgba(248,244,232,0.55)] underline-offset-4 hover:text-[#FFD700] hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#FFD700] focus-visible:ring-offset-2 focus-visible:ring-offset-[#100D08]"
             >
               Privacy Notice
+            </Link>
+            <Link
+              to="/install"
+              className="text-xs text-[rgba(248,244,232,0.55)] underline-offset-4 hover:text-[#FFD700] hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#FFD700] focus-visible:ring-offset-2 focus-visible:ring-offset-[#100D08]"
+            >
+              Install App
             </Link>
             <span className="gold-text text-xs">
               Trusted Real Estate Partner in Delhi NCR

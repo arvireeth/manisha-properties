@@ -1,6 +1,6 @@
 
 import { Routes, Route, useLocation } from "react-router-dom";
-import { useEffect, useLayoutEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 import Navbar from "./components/Navbar";
 import Footer from "./components/Footer";
@@ -18,15 +18,8 @@ import InstallApp, { type InstallPrompt } from "./pages/InstallApp";
 function ScrollToTop() {
   const { pathname } = useLocation();
 
-  useLayoutEffect(() => {
-    const root = document.documentElement;
-    const previousScrollBehavior = root.style.scrollBehavior;
-
-    // Override the site's global smooth scrolling for route changes.
-    root.style.scrollBehavior = "auto";
-    void root.offsetHeight;
+  useEffect(() => {
     window.scrollTo(0, 0);
-    root.style.scrollBehavior = previousScrollBehavior;
   }, [pathname]);
 
   return null;

@@ -8,6 +8,7 @@ import ShareContact from "./components/ShareContact";
 import { WeatherExperience } from "./components/WeatherExperience";
 import AnalyticsConsent from "./components/AnalyticsConsent";
 import OpeningIntro from "./components/OpeningIntro";
+import UpdatePrompt from "./components/UpdatePrompt";
 
 import Home from "./pages/Home";
 import { About } from "./pages/About";
@@ -83,6 +84,7 @@ function App() {
       <Footer />
       <ShareContact />
       <AnalyticsConsent />
+      <UpdatePrompt />
     </div>
     </WeatherExperience>
   );

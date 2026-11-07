@@ -172,20 +172,28 @@ export function WeatherExperience({ children }: { children: ReactNode }) {
     if (savedCoordinates) {
       loadVisitorWeather(savedCoordinates.latitude, savedCoordinates.longitude);
     } else {
-      if ('geolocation' in navigator) {
-        navigator.geolocation.getCurrentPosition(
-          (position) => {
-            if (!active) return;
-            const { latitude, longitude } = position.coords;
-            try { sessionStorage.setItem('mp-location-coordinates', JSON.stringify({ latitude, longitude, savedAt: Date.now() })); } catch { /* Session-only cache is optional. */ }
-            loadVisitorWeather(latitude, longitude);
-          },
-          () => { if (active) { setVisitorWeather(null); setLocationStatus('denied'); } },
-          { enableHighAccuracy: false, timeout: 7000, maximumAge: 30 * 60 * 1000 }
-        );
-      } else {
-        setLocationStatus('unavailable');
-      }
+      // A new visitor chooses when to share location. Reuse a prior grant
+      // without showing another permission prompt when the browser supports it.
+      if (!('geolocation' in navigator)) setLocationStatus('unavailable');
+      else if ('permissions' in navigator) {
+        navigator.permissions.query({ name: 'geolocation' }).then((permission) => {
+          if (!active) return;
+          if (permission.state !== 'granted') {
+            setLocationStatus(permission.state === 'denied' ? 'denied' : 'unavailable');
+            return;
+          }
+          navigator.geolocation.getCurrentPosition(
+            (position) => {
+              if (!active) return;
+              const { latitude, longitude } = position.coords;
+              try { sessionStorage.setItem('mp-location-coordinates', JSON.stringify({ latitude, longitude, savedAt: Date.now() })); } catch { /* Optional session cache. */ }
+              loadVisitorWeather(latitude, longitude);
+            },
+            () => { if (active) setLocationStatus('unavailable'); },
+            { enableHighAccuracy: false, timeout: 7000, maximumAge: 30 * 60 * 1000 }
+          );
+        }).catch(() => { if (active) setLocationStatus('unavailable'); });
+      } else setLocationStatus('unavailable');
     }
 
     const refresh = () => {
@@ -292,7 +300,7 @@ export function WeatherWidget() {
             </div>
           ) : (
             <div className="text-xs text-[rgba(248,244,232,0.6)]">
-              {locationStatus === 'checking' ? 'Checking your location…' : 'Local weather unavailable'}
+              {locationStatus === 'checking' ? 'Checking your location…' : locationStatus === 'denied' ? 'Location access is off' : 'Share location to see local weather'}
             </div>
           )}
         </div>
@@ -304,7 +312,6 @@ export function WeatherWidget() {
             {locationStatus === 'denied' ? 'Enable location in browser settings' : 'Use my local weather'}
           </button>
         )}
-        <a href="https://www.visualcrossing.com/" target="_blank" rel="noreferrer" className="underline underline-offset-2 hover:text-[#D4AF37]">Weather by Visual Crossing</a>
       </div>
     </aside>
   );

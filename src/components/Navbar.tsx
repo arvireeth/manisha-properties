@@ -66,7 +66,7 @@ function Navbar({ canInstall, requestInstall }: { canInstall: boolean; requestIn
         <div className="flex items-center justify-between h-20">
           {/* Logo */}
 
-          <Link to="/" className="flex items-center gap-3">
+          <Link to="/" className="flex min-w-0 items-center gap-2 sm:gap-3">
             <div className="relative">
               <div className="absolute inset-0 rounded-full bg-gold-500 opacity-20 blur-md" />
 
@@ -77,12 +77,12 @@ function Navbar({ canInstall, requestInstall }: { canInstall: boolean; requestIn
               />
             </div>
 
-            <div className="hidden sm:block">
-              <div className="text-base font-serif font-bold gold-text">
+            <div className="min-w-0">
+              <div className="whitespace-nowrap text-[13px] sm:text-base font-serif font-bold gold-text">
                 Manisha Properties
               </div>
 
-              <div className="text-[10px] text-[rgba(248,244,232,0.55)] tracking-widest uppercase">
+              <div className="whitespace-nowrap text-[8px] sm:text-[10px] text-[rgba(248,244,232,0.7)] tracking-[0.08em] sm:tracking-widest uppercase">
                 Advisors & Consultants
               </div>
             </div>

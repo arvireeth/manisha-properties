@@ -7,6 +7,7 @@ import Footer from "./components/Footer";
 import ShareContact from "./components/ShareContact";
 import { WeatherExperience } from "./components/WeatherExperience";
 import AnalyticsConsent from "./components/AnalyticsConsent";
+import OpeningIntro from "./components/OpeningIntro";
 
 import Home from "./pages/Home";
 import { About } from "./pages/About";
@@ -58,6 +59,7 @@ function App() {
 
   return (
     <WeatherExperience>
+    <OpeningIntro />
     <div className="min-h-screen flex flex-col">
       <ScrollToTop />
       <a

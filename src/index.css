@@ -7,9 +7,7 @@
     box-sizing: border-box;
   }
 
-  html {
-    scroll-behavior: smooth;
-  }
+  html { scroll-behavior: auto; }
 
   body {
     background: linear-gradient(135deg, #0A0805 0%, #1A1208 50%, #0D0A06 100%);

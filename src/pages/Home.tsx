@@ -18,6 +18,7 @@ import { useYouTube, YOUTUBE_PLAYLISTS } from '../hooks/useYouTube';
 import { VideoCard } from '../components/VideoCard';
 import { useNavigate } from 'react-router-dom';
 import WhatsAppEnquiry from '../components/WhatsAppEnquiry';
+import { WeatherWidget } from '../components/WeatherExperience';
 
 const services = [
   { icon: HomeIcon, label: 'Sale', desc: 'Premium property sale listings across Delhi NCR' },
@@ -162,18 +163,8 @@ function Home() {
               latitude: '28.660133',
               longitude: '77.153424',
             },
-            openingHours: [
-              'Mo-Su 10:00-19:00',
-            ],
-            founder: {
-              '@type': 'Person',
-              name: 'Manisha Gupta',
-            },
-            foundingDate: '2015',
             description:
-              'Trusted DLF Authorized Channel Partner providing property buying, selling, rental, investment consulting and property management services.',
-            slogan: 'Trusted DLF Authorized Channel Partner',
-            priceRange: '₹₹',
+              'Real estate property buying, selling, rental and property management services in Moti Nagar and Delhi NCR.',
             makesOffer: [
               {
                 '@type': 'Offer',
@@ -274,23 +265,25 @@ function Home() {
                 </div>
 
                 <h1 className="font-serif text-4xl sm:text-5xl lg:text-6xl font-bold leading-tight">
-                  <span className="text-[#F8F4E8]">Find Your</span>
+                  <span className="text-[#F8F4E8]">Buy or rent at</span>
                   <br />
-                  <span className="gold-text-shine">Dream Property</span>
+                  <span className="gold-text-shine">DLF Capital Greens</span>
                 </h1>
 
                 <p className="text-base sm:text-lg text-[rgba(248,244,232,0.65)] leading-relaxed max-w-xl">
-                  Manisha Properties brings you exclusive real estate opportunities — from luxury homes
-                  to strategic investments. Expert guidance at every step of your property journey.
+                  Explore property tours in Moti Nagar and speak with Manisha Gupta about availability and viewings.
                 </p>
 
                 <div className="flex flex-wrap gap-4">
                   <button
-                    onClick={() => navigate('/videos')}
+                    onClick={() => navigate('/videos?category=sale')}
                     className="btn-gold flex items-center gap-2 text-sm"
                   >
                     <Play size={16} className="fill-[#0A0805]" />
-                    Watch Property Videos
+                    Browse properties for sale
+                  </button>
+                  <button type="button" onClick={() => navigate('/videos?category=rental')} className="btn-glass text-sm">
+                    Browse rentals
                   </button>
 
                   <a
@@ -311,6 +304,8 @@ function Home() {
                     Call Now
                   </a>
                 </div>
+
+                <WeatherWidget />
 
                 {/* Stats Row */}
                 <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 pt-4">
@@ -337,11 +332,17 @@ function Home() {
                   <div className="absolute inset-0 rounded-2xl bg-[rgba(212,175,55,0.15)] blur-3xl scale-110" />
                   <div className="absolute inset-0 rounded-2xl border border-[rgba(212,175,55,0.2)] animate-pulse-gold" />
 
-                  <div className="relative glass-card-strong p-2 max-w-sm w-full mx-auto">
+                  <div className="relative glass-card-strong p-2 max-w-sm w-full mx-auto aspect-[2/3]">
                     <img
-                      src="/images/Manisha_Properties_visiting_card.webp"
-                      alt="Manisha Properties Real Estate Consultant Delhi NCR"
-                      className="w-full rounded-xl object-contain"
+                      src="/images/Manisha_Properties_visiting_card-640.webp"
+                      srcSet="/images/Manisha_Properties_visiting_card-400.webp 400w, /images/Manisha_Properties_visiting_card-640.webp 640w"
+                      sizes="(max-width: 640px) calc(100vw - 32px), 366px"
+                      alt="Manisha Properties visiting card with real estate consulting contact details"
+                      width={640}
+                      height={960}
+                      loading="lazy"
+                      decoding="async"
+                      className="h-full w-full rounded-xl object-contain"
                     />
                   </div>
                 </div>
@@ -509,6 +510,33 @@ function Home() {
                 </button>
               </div>
             )}
+          </div>
+        </section>
+
+        {/* Visit our office — interactive OpenStreetMap */}
+        <section className="py-20 px-4 sm:px-6 lg:px-8">
+          <div className="max-w-7xl mx-auto grid lg:grid-cols-[0.85fr_1.15fr] gap-10 items-center">
+            <div className="space-y-5">
+              <p className="text-xs text-[rgba(212,175,55,0.7)] uppercase tracking-widest font-medium">Visit Our Office</p>
+              <h2 className="font-serif text-3xl sm:text-4xl font-bold"><span className="text-[#F8F4E8]">Find Us </span><span className="gold-text">in Delhi</span></h2>
+              <div className="gold-divider max-w-[120px]" />
+              <a href="https://www.google.com/maps/dir/?api=1&destination=28.660133%2C77.153424" target="_blank" rel="noopener noreferrer" className="group inline-flex items-start gap-3 text-[rgba(248,244,232,0.78)] hover:text-[#FFD700] transition-colors">
+                <MapPin size={20} className="mt-1 shrink-0 text-[#D4AF37]" />
+                <span className="leading-relaxed">Block 3, Ground Floor, CSP Unit No-1<br />DLF Capital Greens, Moti Nagar<br />New Delhi, Delhi 110015<br /><span className="text-sm text-[#D4AF37] underline underline-offset-4">Open directions</span></span>
+              </a>
+              <p className="text-sm text-[rgba(248,244,232,0.5)]">Explore the map, zoom in and move around to find our office entrance.</p>
+            </div>
+            <div className="office-map-shell glass-card-strong">
+              <div className="office-map-marker" aria-hidden="true"><span /></div>
+              <iframe
+                title="Manisha Properties office map at DLF Capital Greens, Moti Nagar"
+                src="https://www.openstreetmap.org/export/embed.html?bbox=77.1434%2C28.6540%2C77.1634%2C28.6662&layer=mapnik&marker=28.660133%2C77.153424"
+                loading="lazy"
+                referrerPolicy="no-referrer-when-downgrade"
+                className="office-map-frame"
+              />
+              <div className="office-map-caption"><span>Manisha Properties · DLF Capital Greens</span><a href="https://www.openstreetmap.org/?mlat=28.660133&mlon=77.153424#map=17/28.660133/77.153424" target="_blank" rel="noopener noreferrer">View larger map</a></div>
+            </div>
           </div>
         </section>
 

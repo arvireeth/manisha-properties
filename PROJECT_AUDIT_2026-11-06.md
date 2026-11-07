@@ -192,3 +192,67 @@ Started the first ordered follow-up: accessibility and keyboard support.
   2. https://manishaproperties.vercel.app/*
   3. https://manisha-properties-arvireeths-projects.vercel.app/*
 - Do not add broad *.vercel.app wildcards. The preview API key is a separate Vercel Preview-only variable (VITE_YOUTUBE_API_KEY_PREVIEW), so the production key should not be opened to arbitrary preview deployments.
+
+
+## Experience enhancement phase — 2026-11-06 (local implementation)
+- Created isolated branch `work/manisha-experience-enhancements-2026-11-06` from verified release checkpoint `2621bb4`. No push or deployment has been performed.
+- Added a session-scoped, skippable logo introduction; automatically disabled for reduced-motion users.
+- Added application-level weather backdrop so conditions persist across all site routes. Visitor geolocation is requested once per browser session; denied/unavailable permission falls back to office weather.
+- Added animated office temperature/conditions widget on Home for DLF Capital Greens coordinates 28.6601, 77.1534, including feels-like, humidity and wind speed.
+- Added weather states for sun, cloud, rain, snow, thunderstorm, fog and clear night. Effects are pointer-transparent and reduced-motion aware.
+- Added interactive OpenStreetMap embed, pulsing office marker, larger-map link and Google Maps directions link using coordinates; no paid Maps API or API key.
+- Updated Privacy Notice with location/weather provider disclosure and user controls.
+- Licensing review: Open-Meteo free API is non-commercial only and was rejected for this commercial property website. Visual Crossing's official 28 Oct 2026 documentation says its anonymous no-key Weather API permits commercial applications without subscription subject to fair-use controls and attribution. No fixed anonymous request allowance or SLA is guaranteed; 30-minute browser caching is implemented and traffic should be monitored. Sources: https://www.visualcrossing.com/resources/documentation/weather-api/free-weather-api-no-key/ and https://www.visualcrossing.com/resources/documentation/what-can-i-do-with-the-visual-crossing-weather-free-plan/.
+- Validation: lint PASS; typecheck PASS; production build PASS; git diff --check PASS. Local production-mode Chrome tests verified intro lifecycle, simulated visitor geolocation/weather, business temperature, weather backdrop persistence on Videos route, reduced-motion behaviour, Privacy Notice disclosure, and no horizontal overflow at 320/390/768/1440 CSS px. No runtime exceptions observed. Weather and OSM endpoints both returned HTTP 200.
+- Limitations: real physical-device GPS/permission testing, every weather effect under live conditions, full Lighthouse/accessibility audit, authenticated Vercel Preview testing, and exact office entrance pin confirmation remain outstanding.
+- Production safeguards: production deployment/configuration/aliases/API keys unchanged. No push, Preview deployment or Production deployment performed. Production release requires explicit user approval.
+- Detailed implementation and test record: `docs/EXPERIENCE_ENHANCEMENTS_2026-11-06.md`.
+
+
+## Experience enhancement preview deployment — 2026-11-06
+- Enhancement branch `work/manisha-experience-enhancements-2026-11-06` was pushed separately from the production branch.
+- Initial implementation commit: `cde92d5406689447c0fa689e28020348d1135a72`.
+- Vercel Preview deployment `dpl_FnhrMCpp1GNUfDF6wMRbj8KrUbdH` reached READY at `https://manisha-properties-27cpbhyqg-arvireeths-projects.vercel.app`.
+- Authenticated Vercel fetch returned HTTP 200 for `/`, `/about`, `/videos`, `/privacy`, `/manifest.webmanifest` and `/sw.js`. The deployed JS bundle contains the weather, animated intro, office map and privacy-disclosure code.
+- Preview protection remains enabled (`all_except_custom_domains`). No access protection setting or bypass secret was changed.
+- Production remains at deployment `dpl_FnVyDy7Y4FXNx9NGjJHm7a9HbZWG`, commit `2621bb447468254485a2b54a7341f25d2ccf8b13` on `main`; no Production deployment or alias change occurred.
+- Local Chrome runtime testing covered the actual built code and responsive viewports; protected Preview route fetches verified HTTP delivery but are not a substitute for interactive browser review on the deployed preview.
+- Production release requires explicit user approval.
+
+
+## Weather visual refinement — 2026-11-06
+- Increased weather detail without new dependencies or paid services: layered rainfall and translucent moving droplets, multi-speed snow, sun glow, moving cloud banks, fog, subtle lightning, and wind-sweep lines. Added wind/hail classification and cloud-sun/moon/wind icons.
+- Fixed visitor-location continuity: granted visitor coordinates are held only in sessionStorage and reused on same-session reloads, avoiding another permission prompt while retaining visitor-area weather. Weather responses remain cached locally for 30 minutes.
+- Simulated eight weather types in Chrome against cached test responses. Correct visual layer and expected particle counts were confirmed; no horizontal overflow.
+- Live no-key Visual Crossing endpoint returned HTTP 200 with current office conditions.
+- User confirmed saving the exact preview referrer pattern `https://manisha-properties-g8aaefqbq-arvireeths-projects.vercel.app/*` in Google Cloud. API restriction remains YouTube Data API v3. Preview interactive testing is still blocked by Vercel SSO in the authenticated test browser; SSO remains enabled.
+- Re-ran lint, typecheck, production build/PWA generation and diff checks successfully after refinement.
+
+- Follow-up QA fixed the temperature counter's initial zero-value state: it now initializes from the actual weather reading and animates only subsequent changes. Live Chrome check showed 29°C, matching the provider's 28.5°C rounded reading.
+- Latest Preview branch alias is `manisha-properties-git-work-manisha-948bbc-arvireeths-projects.vercel.app`; this is preferable to one-off deployment hostnames for persistent API-key referrer allowlisting.
+
+
+## First-paint and weather-visibility correction — 2026-11-06
+- Fixed opening intro flash/order: visibility is determined during the initial React render rather than post-paint `useEffect`; logo image receives high fetch priority. Chrome confirmed the intro exists on the first rendered frame and clears after its display interval.
+- Fixed weather overlay stacking: moved from z-index 0 (behind content/stacking contexts) to z-index 40, screen-blended, pointer-events none, with stronger translucent particles. Simulated rain displayed 38 streaks and 9 droplets with expected CSS animation.
+- Current office live weather endpoint tested directly in Chrome: HTTP 200, Clear, 28°C. Thus the office location should not display rain at the time of this check. Visitor-location weather depends on permission; otherwise office weather is the fallback.
+- Revalidated lint, typecheck, build/PWA generation and diff checks successfully.
+
+- Added an explicit visitor-location retry/action to the weather widget. When location is unavailable, visitors can choose “Use my local weather”; when browser permission is denied, the widget explains that permission must be enabled in browser settings. Office weather remains the no-permission fallback.
+
+
+## Continued experience QA — 2026-11-06
+- Added accessible Celsius/Fahrenheit control to the office weather widget. Celsius is default; feels-like and main temperature use the same selected unit. Conversion is local, with no additional network call.
+- Chrome built-app test with controlled weather values: 20.5°C displayed as 21°C; toggle displayed 21°F and 70°F feels-like.
+- Confirmed the interactive OpenStreetMap iframe and Google Maps directions link are present in the Home page build.
+- Responsive widths 320/390/768/1440 CSS px: document width 320/390/762/1434 respectively; no horizontal overflow.
+- Updated stale About and Videos sitemap lastmod values to 2026-11-06 for the global experience changes.
+- Re-ran lint, typecheck, production build/PWA generation and diff checks successfully.
+
+## Preview release and weather matrix verification — 2026-11-06
+- Latest code commit `bb0e1525e647f28589d4c005a8cbbae322b87d88` deployed to Vercel Preview deployment `dpl_8gd5kLAQRFBHBx8sbUs2wSpsPfuf`, state READY. Stable alias: `https://manisha-properties-git-work-manisha-948bbc-arvireeths-projects.vercel.app`.
+- Vercel authenticated fetch: HTTP 200 for Home, About, Videos, Privacy, PWA manifest, service worker, sitemap and robots.txt. JS and CSS assets retrieved successfully. Preview SSO remains enabled.
+- Local Chrome simulated all eight weather types (clear, partly cloudy, rain, snow, thunderstorm, fog, windy, clear night); all mapped to the expected layer. Rain 38 streaks/9 droplets, snow 42 flakes, storm 48 streaks/12 droplets.
+- Celsius/Fahrenheit toggle and feels-like conversion verified in Chrome. Office map iframe and Google Maps directions anchor verified. Responsive document width did not exceed viewport at 320/390/768/1440px.
+- `npm audit --omit=dev`: zero production dependency vulnerabilities.
+- No production deployment, alias, environment variable, API key, Vercel protection or branch setting was modified.

@@ -111,7 +111,7 @@ export function About() {
             <div className="relative flex items-center justify-center order-first lg:order-first animate-fade-in">
               <div className="relative max-w-sm w-full mx-auto">
                 {/* Glow effects */}
-                <div className="absolute -inset-6 rounded-3xl bg-[rgba(212,175,55,0.12)] blur-3xl" />
+                <div className="absolute -inset-4 sm:-inset-6 rounded-3xl bg-[rgba(212,175,55,0.12)] blur-3xl" />
                 <div
                   className="absolute inset-0 rounded-3xl border border-[rgba(212,175,55,0.25)]"
                   style={{ transform: 'rotate(3deg)' }}
@@ -147,6 +147,10 @@ export function About() {
 
             {/* About Content */}
             <div className="space-y-8 animate-fade-in-up" style={{ animationDelay: '0.2s' }}>
+              <div>
+                <h2 className="font-serif text-3xl gold-text">Meet Manisha Gupta</h2>
+                <p className="mt-2 text-[#F8F4E8]/75">Property advisor in DLF Capital Greens, Moti Nagar.</p>
+              </div>
               <div className="space-y-5 text-[rgba(248,244,232,0.7)] leading-relaxed">
                 <p className="text-base sm:text-lg">
                   <span className="font-serif text-[#D4AF37] font-semibold">Manisha Properties Advisors and Consultants</span> is
@@ -163,6 +167,11 @@ export function About() {
                   Our YouTube channel features detailed property tours, market insights, and investment tips
                   — making real estate knowledge accessible to everyone.
                 </p>
+              </div>
+
+              <div>
+                <h3 className="font-serif text-lg font-semibold gold-text mb-2">What happens after you enquire</h3>
+                <p className="text-sm text-[#F8F4E8]/75">Share whether you want to buy or rent, along with your preferred area and budget. Ask Manisha about availability and discuss arranging a viewing.</p>
               </div>
 
               {/* Services List */}

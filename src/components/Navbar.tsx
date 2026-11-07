@@ -1,12 +1,27 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, type MouseEvent } from "react";
 import { Menu, X, Phone } from "lucide-react";
-import { Link, useLocation } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 
-function Navbar() {
+import type { RequestInstall } from "../pages/InstallApp";
+
+function Navbar({ canInstall, requestInstall }: { canInstall: boolean; requestInstall: RequestInstall }) {
   const [scrolled, setScrolled] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
 
   const location = useLocation();
+  const navigate = useNavigate();
+
+  async function handleInstallClick(event: MouseEvent<HTMLAnchorElement>) {
+    setMenuOpen(false);
+    if (!canInstall || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
+
+    event.preventDefault();
+    try {
+      if (!await requestInstall()) navigate("/install");
+    } catch {
+      navigate("/install");
+    }
+  }
 
   useEffect(() => {
     const handleScroll = () => setScrolled(window.scrollY > 40);
@@ -35,6 +50,7 @@ function Navbar() {
     { label: "Home", path: "/" },
     { label: "Property Videos", path: "/videos" },
     { label: "About Us", path: "/about" },
+    { label: "Install App", path: "/install" },
   ];
 
   return (
@@ -50,7 +66,7 @@ function Navbar() {
         <div className="flex items-center justify-between h-20">
           {/* Logo */}
 
-          <Link to="/" className="flex items-center gap-3">
+          <Link to="/" className="flex min-w-0 items-center gap-2 sm:gap-3">
             <div className="relative">
               <div className="absolute inset-0 rounded-full bg-gold-500 opacity-20 blur-md" />
 
@@ -61,12 +77,12 @@ function Navbar() {
               />
             </div>
 
-            <div className="hidden sm:block">
-              <div className="text-base font-serif font-bold gold-text">
+            <div className="min-w-0">
+              <div className="whitespace-nowrap text-[13px] sm:text-base font-serif font-bold gold-text">
                 Manisha Properties
               </div>
 
-              <div className="text-[10px] text-[rgba(248,244,232,0.55)] tracking-widest uppercase">
+              <div className="whitespace-nowrap text-[8px] sm:text-[10px] text-[rgba(248,244,232,0.7)] tracking-[0.08em] sm:tracking-widest uppercase">
                 Advisors & Consultants
               </div>
             </div>
@@ -74,11 +90,12 @@ function Navbar() {
 
           {/* Desktop Menu */}
 
-          <div className="hidden md:flex items-center gap-8">
+          <div className="hidden md:flex items-center gap-4 lg:gap-8">
             {navItems.map((item) => (
               <Link
                 key={item.path}
                 to={item.path}
+                onClick={item.path === "/install" ? handleInstallClick : undefined}
                 aria-current={location.pathname === item.path ? "page" : undefined}
                 className={`nav-link text-sm tracking-wide transition-colors ${
                   location.pathname === item.path
@@ -130,7 +147,7 @@ function Navbar() {
               key={item.path}
               to={item.path}
               aria-current={location.pathname === item.path ? "page" : undefined}
-              onClick={() => setMenuOpen(false)}
+              onClick={item.path === "/install" ? handleInstallClick : () => setMenuOpen(false)}
               className={`block px-5 py-4 ${
                 location.pathname === item.path
                   ? "text-[#D4AF37]"

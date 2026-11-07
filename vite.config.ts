@@ -8,12 +8,12 @@ export default defineConfig({
   plugins: [
     react(),
     VitePWA({
-      registerType: 'autoUpdate',
+      registerType: 'prompt',
 
       includeAssets: [
-        'icons/pwa-192x192.png',
-        'icons/pwa-512x512.png',
-        'icons/apple-touch-icon.png',
+        'icons/app-icon-gold-192.png',
+        'icons/app-icon-gold-512.png',
+        'icons/apple-touch-icon-gold.png',
         'images/**/*',
       ],
 
@@ -22,21 +22,21 @@ export default defineConfig({
         name: 'Manisha Properties',
         short_name: 'Manisha',
         description: 'Explore properties and real estate services from Manisha Properties.',
-        theme_color: '#D4AF37',
-        background_color: '#F8F5EC',
+        theme_color: '#0A0805',
+        background_color: '#0A0805',
         display_override: ['window-controls-overlay', 'standalone'],
         display: 'standalone',
         scope: '/',
         start_url: '/',
         icons: [
           {
-            src: '/icons/pwa-192x192.png',
+            src: '/icons/app-icon-gold-192.png',
             sizes: '192x192',
             type: 'image/png',
             purpose: 'any',
           },
           {
-            src: '/icons/pwa-512x512.png',
+            src: '/icons/app-icon-gold-512.png',
             sizes: '512x512',
             type: 'image/png',
             purpose: 'any',
@@ -50,11 +50,10 @@ export default defineConfig({
         ],
         maximumFileSizeToCacheInBytes: 3 * 1024 * 1024,
         navigateFallback: 'index.html',
+        // Workbox matches the pathname and query string together.
         navigateFallbackAllowlist: [
-          /^\/$/,
-          /^\/about\/?$/,
-          /^\/videos\/?$/,
-          /^\/privacy\/?$/,
+          /^\/(?:\?.*)?$/,
+          /^\/(?:about|videos|privacy|install)\/?(?:\?.*)?$/,
         ],
         cleanupOutdatedCaches: true,
       },

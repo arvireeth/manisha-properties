@@ -45,7 +45,8 @@ function PrivacyNotice() {
             <p className="mt-3">
               The property enquiry form lets you select your requirement and
               optionally enter a preferred location and approximate budget.
-              These entries remain in the page until you choose
+              These entries are used to prepare a WhatsApp message and remain
+              in the page until you choose
               <strong className="text-[#F8F4E8]"> Continue on WhatsApp</strong>.
               That action opens WhatsApp with a pre-filled message addressed
               to Manisha Properties. Review it before sending. The website
@@ -64,13 +65,28 @@ function PrivacyNotice() {
               Website analytics
             </h2>
             <p className="mt-3">
-              This website currently uses Google Analytics (measurement ID
-              G-0B88R2EHR4) to understand website usage and improve the site.
-              Google Analytics may use cookies or similar technologies and
-              process technical and interaction information, such as pages
-              viewed and device/browser information. Google's processing is
-              subject to Google's own terms and privacy information.
+              Optional Google Analytics is loaded only if you select
+              “Allow analytics” in the website privacy-choice notice. If you
+              reject optional analytics, the Analytics tag is not loaded by
+              this website. If you accept, Google Analytics may use cookies or
+              similar technologies and process technical and interaction
+              information such as page views, browser/device information, and
+              clicks on phone, WhatsApp and property-video links. The website
+              does not send enquiry text, names, email addresses, phone
+              numbers, or the location and budget entries from the enquiry
+              form as Analytics event data. Google's processing is subject to
+              Google's own terms and privacy information.
             </p>
+            <p className="mt-3">
+              You can change your choice at any time using the control below.
+            </p>
+            <button
+              type="button"
+              onClick={() => window.dispatchEvent(new Event('mp:manage-analytics'))}
+              className="btn-glass mt-3 min-h-10 px-4 text-sm"
+            >
+              Review analytics choice
+            </button>
             <p className="mt-3">
               Learn more in Google's
               {' '}
@@ -83,6 +99,32 @@ function PrivacyNotice() {
                 Privacy Policy
               </a>
               .
+            </p>
+          </section>
+
+          <section>
+            <h2 className="font-serif text-xl font-semibold text-[#D4AF37]">
+              Weather and approximate location
+            </h2>
+            <p className="mt-3">
+              The website can display current weather for the Manisha Properties
+              office and use local weather conditions for subtle background
+              effects. Your browser may ask for permission to share your device
+              location when you choose to use local weather. If you allow it, the coordinates are used to request
+              weather for your area; they are not sent to a Manisha Properties
+              website database. If you deny permission or location is unavailable,
+              the website uses office-area weather instead. The location choice
+              is not required to browse or use the website.
+            </p>
+            <p className="mt-3">
+              Weather information is provided by{' '}
+              <a href="https://www.visualcrossing.com/" target="_blank" rel="noopener noreferrer" className="text-[#FFD700] underline underline-offset-4">Visual Crossing Weather</a>.
+              The weather provider receives the weather lookup coordinates and
+              normal connection information such as your public IP address.
+              Weather results are cached in your browser for up to 10 minutes,
+              and shared coordinates are kept in this browsing session for up to 30 minutes
+              to reduce repeat requests. You can manage or revoke location
+              permission in your browser or device settings.
             </p>
           </section>
 

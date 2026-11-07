@@ -251,13 +251,14 @@ export function WeatherWidget() {
   const businessKind = businessWeather ? weatherKind(businessWeather.icon) : 'sun';
   const animationWeather = visitorWeather ?? businessWeather;
   const animationKind = animationWeather ? weatherKind(animationWeather.icon) : null;
+  const visitorKind = visitorWeather ? weatherKind(visitorWeather.icon) : null;
   const conditionLabel: Record<string, string> = {
     storm: 'Thunderstorm', snow: 'Snow', rain: 'Rain', fog: 'Fog',
     windy: 'Wind', cloud: 'Cloudy', night: 'Clear night', sun: 'Clear skies',
   };
 
   return (
-    <aside className="weather-widget glass-card" aria-label="Current weather at Manisha Properties office">
+    <aside className="weather-widget glass-card" aria-label="Weather near Manisha Properties office and your shared location">
       <div className="flex items-center gap-3">
         <div className="weather-icon text-[#D4AF37]"><WeatherIcon kind={businessKind} size={28} /></div>
         <div className="min-w-0">
@@ -266,7 +267,7 @@ export function WeatherWidget() {
             <div className="flex items-baseline gap-2">
               <AnimatedTemperature value={businessWeather.temp} unit={temperatureUnit} />
               <button type="button" onClick={() => setTemperatureUnit((unit) => unit === 'C' ? 'F' : 'C')} aria-label={`°${temperatureUnit === 'C' ? 'F' : 'C'} — Switch to degrees ${temperatureUnit === 'C' ? 'Fahrenheit' : 'Celsius'}`} className="rounded border border-[rgba(212,175,55,0.28)] px-1.5 py-0.5 text-[10px] font-semibold text-[#D4AF37] hover:bg-[rgba(212,175,55,0.12)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#FFD700]">°{temperatureUnit === 'C' ? 'F' : 'C'}</button>
-              <span className="text-xs text-[rgba(248,244,232,0.7)]">{businessWeather.conditions}</span>
+              <span className="weather-condition-glow">{conditionLabel[businessKind]}</span>
             </div>
           ) : (
             <div className="text-sm text-[rgba(248,244,232,0.65)]">{weatherUnavailable ? 'Weather temporarily unavailable' : 'Checking current weather…'}</div>
@@ -280,8 +281,24 @@ export function WeatherWidget() {
           <span className="inline-flex items-center gap-1"><Wind size={12} /> {Math.round(businessWeather.windspeed)} km/h</span>
         </div>
       )}
+      <div className="weather-area-row">
+        <div className="weather-icon text-[#D4AF37]"><WeatherIcon kind={visitorKind ?? 'sun'} size={22} /></div>
+        <div className="min-w-0">
+          <div className="weather-area-label">Your area · shared location</div>
+          {visitorWeather && visitorKind ? (
+            <div className="weather-area-reading">
+              <span className="weather-condition-glow">{conditionLabel[visitorKind]}</span>
+              <span>{Math.round(temperatureUnit === 'F' ? (visitorWeather.temp * 9) / 5 + 32 : visitorWeather.temp)}°{temperatureUnit}</span>
+            </div>
+          ) : (
+            <div className="text-xs text-[rgba(248,244,232,0.6)]">
+              {locationStatus === 'checking' ? 'Checking your location…' : 'Local weather unavailable'}
+            </div>
+          )}
+        </div>
+      </div>
       <div className="mt-2 flex flex-wrap items-center gap-x-2 gap-y-1 text-[10px] text-[rgba(248,244,232,0.58)]">
-        {animationKind && <span>Animation: {conditionLabel[animationKind]} near {visitorWeather ? 'your shared location' : 'Moti Nagar office'}</span>}
+        {animationKind && <span>Animation follows {visitorWeather ? 'your area' : 'the office'}.</span>}
         {!visitorWeather && locationStatus !== 'checking' && (
           <button type="button" onClick={requestVisitorWeather} className="underline underline-offset-2 text-[#D4AF37] hover:text-[#FFD700] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#FFD700]">
             {locationStatus === 'denied' ? 'Enable location in browser settings' : 'Use my local weather'}

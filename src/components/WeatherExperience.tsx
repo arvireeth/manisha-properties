@@ -235,22 +235,10 @@ export function WeatherExperience({ children }: { children: ReactNode }) {
     () => displayedWeather ? weatherKind(displayedWeather.icon) : 'sun',
     [displayedWeather]
   );
-  const conditionLabel: Record<string, string> = {
-    storm: 'Thunderstorm', snow: 'Snow', rain: 'Rain', fog: 'Fog',
-    windy: 'Wind', cloud: 'Cloudy', night: 'Clear night', sun: 'Clear skies',
-  };
-
   return (
     <WeatherContext.Provider value={{ businessWeather, displayedWeather, visitorWeather, weatherUnavailable, locationStatus, requestVisitorWeather }}>
       {children}
       {displayedWeather && pageVisible && <WeatherLayer kind={kind} />}
-      {displayedWeather && (
-        <div className="weather-source-badge" role="status">
-          <WeatherIcon kind={kind} size={16} />
-          <span><strong>{conditionLabel[kind]}</strong> near {visitorWeather ? 'your shared location' : 'Moti Nagar office'}</span>
-          <a href="https://www.visualcrossing.com/" target="_blank" rel="noreferrer" aria-label="Weather data by Visual Crossing">Source</a>
-        </div>
-      )}
     </WeatherContext.Provider>
   );
 }
@@ -261,6 +249,12 @@ export function WeatherWidget() {
   if (!weather) return null;
   const { businessWeather, visitorWeather, weatherUnavailable, locationStatus, requestVisitorWeather } = weather;
   const businessKind = businessWeather ? weatherKind(businessWeather.icon) : 'sun';
+  const animationWeather = visitorWeather ?? businessWeather;
+  const animationKind = animationWeather ? weatherKind(animationWeather.icon) : null;
+  const conditionLabel: Record<string, string> = {
+    storm: 'Thunderstorm', snow: 'Snow', rain: 'Rain', fog: 'Fog',
+    windy: 'Wind', cloud: 'Cloudy', night: 'Clear night', sun: 'Clear skies',
+  };
 
   return (
     <aside className="weather-widget glass-card" aria-label="Current weather at Manisha Properties office">
@@ -287,7 +281,7 @@ export function WeatherWidget() {
         </div>
       )}
       <div className="mt-2 flex flex-wrap items-center gap-x-2 gap-y-1 text-[10px] text-[rgba(248,244,232,0.58)]">
-        <span>Background: {visitorWeather ? 'Your area conditions' : 'Office conditions'}</span>
+        {animationKind && <span>Animation: {conditionLabel[animationKind]} near {visitorWeather ? 'your shared location' : 'Moti Nagar office'}</span>}
         {!visitorWeather && locationStatus !== 'checking' && (
           <button type="button" onClick={requestVisitorWeather} className="underline underline-offset-2 text-[#D4AF37] hover:text-[#FFD700] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#FFD700]">
             {locationStatus === 'denied' ? 'Enable location in browser settings' : 'Use my local weather'}

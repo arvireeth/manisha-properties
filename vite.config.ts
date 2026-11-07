@@ -11,9 +11,9 @@ export default defineConfig({
       registerType: 'prompt',
 
       includeAssets: [
-        'icons/pwa-192x192.png',
-        'icons/pwa-512x512.png',
-        'icons/apple-touch-icon.png',
+        'icons/app-icon-gold-192.png',
+        'icons/app-icon-gold-512.png',
+        'icons/apple-touch-icon-gold.png',
         'images/**/*',
       ],
 
@@ -30,13 +30,13 @@ export default defineConfig({
         start_url: '/',
         icons: [
           {
-            src: '/icons/pwa-192x192.png',
+            src: '/icons/app-icon-gold-192.png',
             sizes: '192x192',
             type: 'image/png',
             purpose: 'any',
           },
           {
-            src: '/icons/pwa-512x512.png',
+            src: '/icons/app-icon-gold-512.png',
             sizes: '512x512',
             type: 'image/png',
             purpose: 'any',

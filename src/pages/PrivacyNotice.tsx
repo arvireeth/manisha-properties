@@ -117,6 +117,16 @@ function PrivacyNotice() {
               is not required to browse or use the website.
             </p>
             <p className="mt-3">
+              If you share your location, the website also sends your current
+              device coordinates directly from your browser to BigDataCloud to
+              identify an approximate locality or city for the weather box.
+              BigDataCloud also receives normal connection information such as
+              your public IP address and uses these signals to improve its
+              location data. The website does not display your street address.
+              If the place-name lookup fails, local weather still works and the
+              box simply says “Your area”.
+            </p>
+            <p className="mt-3">
               Weather information is provided by{' '}
               <a href="https://www.visualcrossing.com/" target="_blank" rel="noopener noreferrer" className="text-[#FFD700] underline underline-offset-4">Visual Crossing Weather</a>.
               The weather provider receives the weather lookup coordinates and
@@ -124,6 +134,8 @@ function PrivacyNotice() {
               Weather results are reused for up to 10 minutes from browser storage
               using an approximate-location cache key. The browser or device manages
               whether your location permission persists across visits.
+              A device position up to five minutes old may be used when you
+              open the website or installed app again.
               You can manage or revoke location
               permission in your browser or device settings.
             </p>

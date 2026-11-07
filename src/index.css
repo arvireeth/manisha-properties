@@ -286,7 +286,6 @@
 .weather-layer i { position: absolute; top: -14%; display: block; width: 1.8px; height: 30px; border-radius: 2px; background: linear-gradient(transparent,rgba(205,228,250,.92)); filter: drop-shadow(0 0 2px rgba(190,220,255,.35)); animation: weather-fall linear infinite; }
 .weather-rain { opacity: .68; }
 .weather-rain::before { content: ''; position: absolute; inset: 0; background: linear-gradient(115deg,transparent 0%,rgba(170,205,235,.035) 48%,transparent 70%); }
-.weather-rain b { position: absolute; display: block; width: 12px; height: 22px; border: 1px solid rgba(205,225,245,.24); border-radius: 65% 35% 58% 42%; background: linear-gradient(135deg,rgba(255,255,255,.14),rgba(130,170,210,.025) 62%,rgba(255,255,255,.08)); box-shadow: inset 1px 1px 2px rgba(255,255,255,.16),0 0 8px rgba(150,195,235,.08); animation: glass-drop-drift ease-in-out infinite alternate; }
 .weather-storm { opacity: .72; }
 .weather-storm::after { content: ''; position: absolute; inset: 0; background: rgba(205,218,238,.13); opacity: 0; animation: storm-flash 11s linear infinite; }
 .weather-snow { opacity: .72; }
@@ -314,7 +313,6 @@
 .weather-night span:nth-child(1) { top: 16%; left: 22%; } .weather-night span:nth-child(2) { top: 38%; left: 76%; animation-delay: -1s; } .weather-night span:nth-child(3) { top: 67%; left: 54%; animation-delay: -2s; }
 @keyframes weather-fall { to { transform: translate3d(-22px,115vh,0); } }
 @keyframes snow-fall { to { transform: translate3d(42px,115vh,0) rotate(220deg); } }
-@keyframes glass-drop-drift { to { transform: translate3d(5px,18px,0) scale(.92); opacity: .35; } }
 @keyframes cloud-drift { to { transform: translateX(55vw); } }
 @keyframes fog-drift { to { transform: translateX(16%); opacity: .55; } }
 @keyframes wind-sweep { 0% { transform: translateX(0) scaleX(.65); opacity: 0; } 35% { opacity: .9; } 100% { transform: translateX(165vw) scaleX(1.2); opacity: 0; } }

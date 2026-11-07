@@ -116,14 +116,10 @@ function WeatherLayer({ kind }: { kind: string }) {
     return <div className={`weather-layer weather-${kind}`} aria-hidden="true"><span /><span /><span /><span /></div>;
   }
   const drops = Array.from({ length: kind === 'storm' ? 48 : kind === 'snow' ? 42 : 38 }, (_, index) => index);
-  const glassDrops = Array.from({ length: kind === 'storm' ? 12 : 9 }, (_, index) => index);
   return (
     <div className={`weather-layer weather-${kind}`} aria-hidden="true">
       {drops.map((drop) => (
         <i key={drop} style={{ left: `${(drop * 37) % 100}%`, animationDelay: `${(drop % 13) * -0.37}s`, animationDuration: `${kind === 'snow' ? 5 + (drop % 7) * 1.4 : 0.72 + (drop % 6) * 0.19}s`, opacity: 0.35 + (drop % 5) * 0.12, ...(kind === 'snow' ? { width: `${3 + (drop % 4)}px`, height: `${3 + (drop % 4)}px` } : {}) }} />
-      ))}
-      {(kind === 'rain' || kind === 'storm') && glassDrops.map((drop) => (
-        <b key={`glass-${drop}`} style={{ left: `${(drop * 61 + 8) % 100}%`, top: `${(drop * 29 + 7) % 86 + 5}%`, animationDelay: `${drop * -1.7}s`, animationDuration: `${9 + (drop % 4) * 2}s` }} />
       ))}
       {kind === 'snow' && <span className="snow-glow" />}
     </div>

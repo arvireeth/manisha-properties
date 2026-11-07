@@ -111,7 +111,7 @@ export function About() {
             <div className="relative flex items-center justify-center order-first lg:order-first animate-fade-in">
               <div className="relative max-w-sm w-full mx-auto">
                 {/* Glow effects */}
-                <div className="absolute -inset-6 rounded-3xl bg-[rgba(212,175,55,0.12)] blur-3xl" />
+                <div className="absolute -inset-4 sm:-inset-6 rounded-3xl bg-[rgba(212,175,55,0.12)] blur-3xl" />
                 <div
                   className="absolute inset-0 rounded-3xl border border-[rgba(212,175,55,0.25)]"
                   style={{ transform: 'rotate(3deg)' }}

@@ -110,7 +110,7 @@ function PrivacyNotice() {
               The website can display current weather for the Manisha Properties
               office and use local weather conditions for subtle background
               effects. Your browser may ask for permission to share your device
-              location when you choose to use local weather. If you allow it, the coordinates are used to request
+              location when you open the website or installed app. If you allow it, the coordinates are used to request
               weather for your area; they are not sent to a Manisha Properties
               website database. If you deny permission or location is unavailable,
               the website uses office-area weather instead. The location choice
@@ -121,9 +121,10 @@ function PrivacyNotice() {
               <a href="https://www.visualcrossing.com/" target="_blank" rel="noopener noreferrer" className="text-[#FFD700] underline underline-offset-4">Visual Crossing Weather</a>.
               The weather provider receives the weather lookup coordinates and
               normal connection information such as your public IP address.
-              Weather results are cached in your browser for up to 10 minutes,
-              and shared coordinates are kept in this browsing session for up to 30 minutes
-              to reduce repeat requests. You can manage or revoke location
+              Weather results are reused for up to 10 minutes from browser storage
+              using an approximate-location cache key. The browser or device manages
+              whether your location permission persists across visits.
+              You can manage or revoke location
               permission in your browser or device settings.
             </p>
           </section>

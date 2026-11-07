@@ -263,21 +263,17 @@
   z-index: 1000;
   display: grid;
   place-items: center;
-  overflow: hidden;
-  background: radial-gradient(ellipse at center, #241a0a 0%, #100d08 52%, #080604 100%);
-  animation: intro-exit 0.45s ease 1.4s forwards;
+  background: #0A0805;
+  animation: intro-fade-out .3s ease .8s both;
 }
-.opening-intro-content { display: flex; flex-direction: column; align-items: center; gap: 0.55rem; animation: intro-enter 0.75s cubic-bezier(.2,.8,.2,1) both; }
-.opening-logo-ring { width: 104px; height: 104px; padding: 5px; border-radius: 50%; border: 1px solid rgba(255,215,0,.7); box-shadow: 0 0 24px rgba(212,175,55,.22), inset 0 0 20px rgba(212,175,55,.12); animation: intro-ring 1.8s ease-in-out infinite alternate; }
-.opening-logo { width: 100%; height: 100%; border-radius: 50%; object-fit: cover; }
-.opening-brand { margin-top: .8rem; color: #f8f4e8; font: 700 clamp(1.5rem,5vw,2.2rem)/1.15 'Playfair Display',serif; letter-spacing: .015em; }
-.opening-tagline { color: #d4af37; font-size: .68rem; text-transform: uppercase; letter-spacing: .25em; }
-.opening-rule { width: 116px; height: 1px; margin-top: .65rem; background: linear-gradient(90deg,transparent,#ffd700,transparent); animation: intro-rule 1.1s ease both; }
-.opening-skip { position: absolute; right: max(1.25rem,env(safe-area-inset-right)); bottom: max(1.25rem,env(safe-area-inset-bottom)); padding: .65rem 1rem; border: 1px solid rgba(212,175,55,.45); border-radius: 999px; color: #f8f4e8; background: rgba(10,8,5,.45); font-size: .8rem; }
-@keyframes intro-enter { from { opacity: 0; transform: translateY(18px) scale(.96); } to { opacity: 1; transform: translateY(0) scale(1); } }
-@keyframes intro-exit { to { opacity: 0; visibility: hidden; pointer-events: none; } }
-@keyframes intro-ring { from { box-shadow: 0 0 16px rgba(212,175,55,.15); } to { box-shadow: 0 0 34px rgba(212,175,55,.38); } }
-@keyframes intro-rule { from { width: 0; opacity: 0; } to { width: 116px; opacity: 1; } }
+.opening-logo {
+  display: block;
+  width: min(44vw, 180px);
+  height: auto;
+  animation: intro-logo-in .45s ease-out both;
+}
+@keyframes intro-logo-in { from { opacity: 0; transform: scale(.94); } to { opacity: 1; transform: scale(1); } }
+@keyframes intro-fade-out { to { opacity: 0; visibility: hidden; pointer-events: none; } }
 
 /* Weather visuals are decorative, subtle and never intercept interaction. */
 .weather-layer { position: fixed; inset: 0; z-index: 40; overflow: hidden; pointer-events: none; opacity: .55; contain: strict; }
@@ -340,5 +336,4 @@
 }
 @media (prefers-reduced-motion: reduce) {
   .opening-intro, .opening-intro *, .weather-layer, .weather-layer *, .weather-temperature, .office-map-marker { animation: none !important; transition: none !important; }
-  .opening-intro { display: none; }
 }

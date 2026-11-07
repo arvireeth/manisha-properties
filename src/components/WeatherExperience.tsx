@@ -13,11 +13,29 @@ type WeatherNow = {
 };
 
 type WeatherResponse = { currentConditions?: WeatherNow };
-type WeatherContextValue = { businessWeather: WeatherNow | null; displayedWeather: WeatherNow | null; visitorWeather: WeatherNow | null; weatherUnavailable: boolean; locationStatus: 'checking' | 'available' | 'denied' | 'unavailable'; requestVisitorWeather: () => void };
+type WeatherContextValue = { businessWeather: WeatherNow | null; displayedWeather: WeatherNow | null; visitorWeather: WeatherNow | null; visitorArea: string | null; weatherUnavailable: boolean; locationStatus: 'checking' | 'available' | 'denied' | 'unavailable'; requestVisitorWeather: () => void };
 
 const WeatherContext = createContext<WeatherContextValue | null>(null);
 const BUSINESS_COORDS = { latitude: 28.6601, longitude: 77.1534 };
 const CACHE_MS = 10 * 60 * 1000;
+const POSITION_MAX_AGE_MS = 5 * 60 * 1000;
+
+async function lookupVisitorArea(latitude: number, longitude: number): Promise<string | null> {
+  // This free endpoint must be called in the visitor's browser using coordinates
+  // freshly obtained from that same device, never from a server or stored data.
+  const url = new URL('https://api.bigdatacloud.net/data/reverse-geocode-client');
+  url.searchParams.set('latitude', String(latitude));
+  url.searchParams.set('longitude', String(longitude));
+  url.searchParams.set('localityLanguage', 'en');
+  const response = await fetch(url, { signal: AbortSignal.timeout(6000) });
+  if (!response.ok) return null;
+  const result = await response.json() as { locality?: string; city?: string; lookupSource?: string; latitude?: number; longitude?: number };
+  if (/ip/i.test(result.lookupSource ?? '')) return null;
+  if (typeof result.latitude === 'number' && Math.abs(result.latitude - latitude) > 0.05) return null;
+  if (typeof result.longitude === 'number' && Math.abs(result.longitude - longitude) > 0.05) return null;
+  const area = result.locality?.trim() || result.city?.trim();
+  return area && area.length <= 80 ? area : null;
+}
 
 function readCache(key: string): WeatherNow | null {
   try {
@@ -135,11 +153,13 @@ function WeatherLayer({ kind }: { kind: string }) {
 
 export function WeatherExperience({ children }: { children: ReactNode }) {
   const [visitorWeather, setVisitorWeather] = useState<WeatherNow | null>(null);
+  const [visitorArea, setVisitorArea] = useState<string | null>(null);
   const [businessWeather, setBusinessWeather] = useState<WeatherNow | null>(null);
   const [weatherUnavailable, setWeatherUnavailable] = useState(false);
   const [locationStatus, setLocationStatus] = useState<'checking' | 'available' | 'denied' | 'unavailable'>('checking');
   const [pageVisible, setPageVisible] = useState(!document.hidden);
   const visitorCoordinates = useRef<{ latitude: number; longitude: number } | null>(null);
+  const locationRequest = useRef(0);
 
   useEffect(() => {
     let active = true;
@@ -151,12 +171,16 @@ export function WeatherExperience({ children }: { children: ReactNode }) {
     refreshBusinessWeather();
 
     const loadVisitorWeather = (latitude: number, longitude: number) => {
+      const request = ++locationRequest.current;
       visitorCoordinates.current = { latitude, longitude };
-      if (active) setLocationStatus('available');
+      if (active) { setLocationStatus('available'); setVisitorArea(null); setVisitorWeather(null); }
+      lookupVisitorArea(latitude, longitude)
+        .then((area) => { if (active && request === locationRequest.current) setVisitorArea(area); })
+        .catch(() => { if (active && request === locationRequest.current) setVisitorArea(null); });
       const cacheKey = 'mp-weather-visitor-v2-' + latitude.toFixed(2) + '-' + longitude.toFixed(2);
       loadWeather(latitude, longitude, cacheKey)
-        .then((data) => { if (active) setVisitorWeather(data); })
-        .catch(() => { if (active) setVisitorWeather(null); });
+        .then((data) => { if (active && request === locationRequest.current) setVisitorWeather(data); })
+        .catch(() => { if (active && request === locationRequest.current) setVisitorWeather(null); });
     };
 
     // Request the browser's location permission on each fresh opening. Browsers
@@ -173,7 +197,7 @@ export function WeatherExperience({ children }: { children: ReactNode }) {
       (error) => {
         if (active) setLocationStatus(error.code === 1 ? 'denied' : 'unavailable');
       },
-      { enableHighAccuracy: false, timeout: 7000, maximumAge: 30 * 60 * 1000 }
+      { enableHighAccuracy: false, timeout: 7000, maximumAge: POSITION_MAX_AGE_MS }
     );
 
     const refresh = () => {
@@ -206,14 +230,26 @@ export function WeatherExperience({ children }: { children: ReactNode }) {
     navigator.geolocation.getCurrentPosition(
       (position) => {
         const { latitude, longitude } = position.coords;
+        const request = ++locationRequest.current;
         visitorCoordinates.current = { latitude, longitude };
+        setVisitorArea(null);
+        setVisitorWeather(null);
+        lookupVisitorArea(latitude, longitude)
+          .then((area) => { if (request === locationRequest.current) setVisitorArea(area); })
+          .catch(() => { if (request === locationRequest.current) setVisitorArea(null); });
         const cacheKey = 'mp-weather-visitor-v2-' + latitude.toFixed(2) + '-' + longitude.toFixed(2);
         loadWeather(latitude, longitude, cacheKey)
-          .then((data) => { setVisitorWeather(data); setLocationStatus('available'); })
-          .catch(() => { setVisitorWeather(null); setLocationStatus('unavailable'); });
+          .then((data) => { if (request === locationRequest.current) { setVisitorWeather(data); setLocationStatus('available'); } })
+          .catch(() => { if (request === locationRequest.current) { setVisitorWeather(null); setLocationStatus('unavailable'); } });
       },
-      () => setLocationStatus('denied'),
-      { enableHighAccuracy: false, timeout: 7000, maximumAge: 30 * 60 * 1000 }
+      (error) => {
+        ++locationRequest.current;
+        visitorCoordinates.current = null;
+        setVisitorArea(null);
+        setVisitorWeather(null);
+        setLocationStatus(error.code === 1 ? 'denied' : 'unavailable');
+      },
+      { enableHighAccuracy: false, timeout: 7000, maximumAge: POSITION_MAX_AGE_MS }
     );
   };
 
@@ -223,7 +259,7 @@ export function WeatherExperience({ children }: { children: ReactNode }) {
     [displayedWeather]
   );
   return (
-    <WeatherContext.Provider value={{ businessWeather, displayedWeather, visitorWeather, weatherUnavailable, locationStatus, requestVisitorWeather }}>
+    <WeatherContext.Provider value={{ businessWeather, displayedWeather, visitorWeather, visitorArea, weatherUnavailable, locationStatus, requestVisitorWeather }}>
       {children}
       {displayedWeather && pageVisible && <WeatherLayer kind={kind} />}
     </WeatherContext.Provider>
@@ -234,7 +270,7 @@ export function WeatherWidget() {
   const weather = useContext(WeatherContext);
   const [temperatureUnit, setTemperatureUnit] = useState<'C' | 'F'>('C');
   if (!weather) return null;
-  const { businessWeather, visitorWeather, weatherUnavailable, locationStatus, requestVisitorWeather } = weather;
+  const { businessWeather, visitorWeather, visitorArea, weatherUnavailable, locationStatus, requestVisitorWeather } = weather;
   const businessKind = businessWeather ? weatherKind(businessWeather.icon) : 'sun';
   const animationWeather = visitorWeather ?? businessWeather;
   const animationKind = animationWeather ? weatherKind(animationWeather.icon) : null;
@@ -271,7 +307,7 @@ export function WeatherWidget() {
       <div className="weather-area-row">
         <div className="weather-icon text-[#D4AF37]"><WeatherIcon kind={visitorKind ?? 'sun'} size={22} /></div>
         <div className="min-w-0">
-          <div className="weather-area-label">Your area · shared location</div>
+          <div className="weather-area-label">Your area{visitorWeather && visitorArea ? ` · ${visitorArea}` : ''}</div>
           {visitorWeather && visitorKind ? (
             <div className="weather-area-reading">
               <span className="weather-condition-glow">{conditionLabel[visitorKind]}</span>

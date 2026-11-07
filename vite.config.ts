@@ -50,11 +50,10 @@ export default defineConfig({
         ],
         maximumFileSizeToCacheInBytes: 3 * 1024 * 1024,
         navigateFallback: 'index.html',
+        // Workbox matches the pathname and query string together.
         navigateFallbackAllowlist: [
-          /^\/$/,
-          /^\/about\/?$/,
-          /^\/videos\/?$/,
-          /^\/privacy\/?$/,
+          /^\/(?:\?.*)?$/,
+          /^\/(?:about|videos|privacy)\/?(?:\?.*)?$/,
         ],
         cleanupOutdatedCaches: true,
       },

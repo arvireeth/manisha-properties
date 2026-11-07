@@ -18,7 +18,6 @@ type WeatherContextValue = { businessWeather: WeatherNow | null; displayedWeathe
 const WeatherContext = createContext<WeatherContextValue | null>(null);
 const BUSINESS_COORDS = { latitude: 28.6601, longitude: 77.1534 };
 const CACHE_MS = 10 * 60 * 1000;
-const COORDINATES_MS = 30 * 60 * 1000;
 
 function readCache(key: string): WeatherNow | null {
   try {
@@ -160,41 +159,22 @@ export function WeatherExperience({ children }: { children: ReactNode }) {
         .catch(() => { if (active) setVisitorWeather(null); });
     };
 
-    let savedCoordinates: { latitude: number; longitude: number } | null = null;
-    try {
-      const saved = sessionStorage.getItem('mp-location-coordinates');
-      if (saved) {
-        const parsed = JSON.parse(saved) as { latitude: number; longitude: number; savedAt?: number };
-        if (Number.isFinite(parsed.latitude) && Number.isFinite(parsed.longitude) && parsed.savedAt && Date.now() - parsed.savedAt < COORDINATES_MS) savedCoordinates = parsed;
-      }
-    } catch { /* Continue with office weather. */ }
-
-    if (savedCoordinates) {
-      loadVisitorWeather(savedCoordinates.latitude, savedCoordinates.longitude);
-    } else {
-      // A new visitor chooses when to share location. Reuse a prior grant
-      // without showing another permission prompt when the browser supports it.
-      if (!('geolocation' in navigator)) setLocationStatus('unavailable');
-      else if ('permissions' in navigator) {
-        navigator.permissions.query({ name: 'geolocation' }).then((permission) => {
-          if (!active) return;
-          if (permission.state !== 'granted') {
-            setLocationStatus(permission.state === 'denied' ? 'denied' : 'unavailable');
-            return;
-          }
-          navigator.geolocation.getCurrentPosition(
-            (position) => {
-              if (!active) return;
-              const { latitude, longitude } = position.coords;
-              try { sessionStorage.setItem('mp-location-coordinates', JSON.stringify({ latitude, longitude, savedAt: Date.now() })); } catch { /* Optional session cache. */ }
-              loadVisitorWeather(latitude, longitude);
-            },
-            () => { if (active) setLocationStatus('unavailable'); },
-            { enableHighAccuracy: false, timeout: 7000, maximumAge: 30 * 60 * 1000 }
-          );
-        }).catch(() => { if (active) setLocationStatus('unavailable'); });
-      } else setLocationStatus('unavailable');
-    }
+    // Request the browser's location permission on each fresh opening. Browsers
+    // reuse a lasting grant automatically; denied requests leave office weather
+    // as the fallback. Clear the old session coordinate copy; weather cache
+    // entries still use an approximate-location key for ten-minute reuse.
+    try { sessionStorage.removeItem('mp-location-coordinates'); } catch { /* Storage may be unavailable. */ }
+    if (!('geolocation' in navigator)) setLocationStatus('unavailable');
+    else navigator.geolocation.getCurrentPosition(
+      (position) => {
+        if (!active) return;
+        loadVisitorWeather(position.coords.latitude, position.coords.longitude);
+      },
+      (error) => {
+        if (active) setLocationStatus(error.code === 1 ? 'denied' : 'unavailable');
+      },
+      { enableHighAccuracy: false, timeout: 7000, maximumAge: 30 * 60 * 1000 }
+    );
 
     const refresh = () => {
       if (document.hidden) return;
@@ -226,7 +206,6 @@ export function WeatherExperience({ children }: { children: ReactNode }) {
     navigator.geolocation.getCurrentPosition(
       (position) => {
         const { latitude, longitude } = position.coords;
-        try { sessionStorage.setItem('mp-location-coordinates', JSON.stringify({ latitude, longitude, savedAt: Date.now() })); } catch { /* Optional session cache. */ }
         visitorCoordinates.current = { latitude, longitude };
         const cacheKey = 'mp-weather-visitor-v2-' + latitude.toFixed(2) + '-' + longitude.toFixed(2);
         loadWeather(latitude, longitude, cacheKey)

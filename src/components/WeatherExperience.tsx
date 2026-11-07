@@ -235,11 +235,22 @@ export function WeatherExperience({ children }: { children: ReactNode }) {
     () => displayedWeather ? weatherKind(displayedWeather.icon) : 'sun',
     [displayedWeather]
   );
+  const conditionLabel: Record<string, string> = {
+    storm: 'Thunderstorm', snow: 'Snow', rain: 'Rain', fog: 'Fog',
+    windy: 'Wind', cloud: 'Cloudy', night: 'Clear night', sun: 'Clear skies',
+  };
 
   return (
     <WeatherContext.Provider value={{ businessWeather, displayedWeather, visitorWeather, weatherUnavailable, locationStatus, requestVisitorWeather }}>
       {children}
       {displayedWeather && pageVisible && <WeatherLayer kind={kind} />}
+      {displayedWeather && (
+        <div className="weather-source-badge" role="status">
+          <WeatherIcon kind={kind} size={16} />
+          <span><strong>{conditionLabel[kind]}</strong> near {visitorWeather ? 'your shared location' : 'Moti Nagar office'}</span>
+          <a href="https://www.visualcrossing.com/" target="_blank" rel="noreferrer" aria-label="Weather data by Visual Crossing">Source</a>
+        </div>
+      )}
     </WeatherContext.Provider>
   );
 }

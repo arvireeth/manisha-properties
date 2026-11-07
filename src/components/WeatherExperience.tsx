@@ -9,6 +9,7 @@ type WeatherNow = {
   windspeed: number;
   conditions: string;
   icon: string;
+  datetimeEpoch?: number;
 };
 
 type WeatherResponse = { currentConditions?: WeatherNow };
@@ -16,14 +17,15 @@ type WeatherContextValue = { businessWeather: WeatherNow | null; displayedWeathe
 
 const WeatherContext = createContext<WeatherContextValue | null>(null);
 const BUSINESS_COORDS = { latitude: 28.6601, longitude: 77.1534 };
-const CACHE_MS = 30 * 60 * 1000;
+const CACHE_MS = 10 * 60 * 1000;
+const COORDINATES_MS = 30 * 60 * 1000;
 
 function readCache(key: string): WeatherNow | null {
   try {
     const cached = localStorage.getItem(key);
     if (!cached) return null;
     const parsed = JSON.parse(cached) as { savedAt: number; data: WeatherNow };
-    return Date.now() - parsed.savedAt < CACHE_MS ? parsed.data : null;
+    return parsed.savedAt <= Date.now() && Date.now() - parsed.savedAt < CACHE_MS ? parsed.data : null;
   } catch {
     return null;
   }
@@ -34,13 +36,17 @@ async function loadWeather(latitude: number, longitude: number, cacheKey: string
   if (cached) return cached;
 
   const place = `${latitude.toFixed(4)},${longitude.toFixed(4)}`;
-  const url = `https://weather.visualcrossing.com/VisualCrossingWebServices/rest/services/timeline/${encodeURIComponent(place)}/today?unitGroup=metric&include=current&contentType=json`;
-  const response = await fetch(url);
+  const url = `https://weather.visualcrossing.com/VisualCrossingWebServices/rest/services/timeline/${encodeURIComponent(place)}?unitGroup=metric&include=current&contentType=json`;
+  const response = await fetch(url, { cache: 'no-store', signal: AbortSignal.timeout(8000) });
   if (!response.ok) throw new Error(`Weather service returned ${response.status}`);
   const result = (await response.json()) as WeatherResponse;
   if (!result.currentConditions) throw new Error('Current weather is unavailable');
 
   const data = result.currentConditions;
+  if (!Number.isFinite(data.temp) || !data.icon || !data.conditions) throw new Error('Invalid current weather');
+  if (data.datetimeEpoch && Math.abs(Date.now() / 1000 - data.datetimeEpoch) > 2 * 60 * 60) {
+    throw new Error('Weather reading is too old');
+  }
   try {
     localStorage.setItem(cacheKey, JSON.stringify({ savedAt: Date.now(), data }));
   } catch {
@@ -49,8 +55,10 @@ async function loadWeather(latitude: number, longitude: number, cacheKey: string
   return data;
 }
 
-function weatherKind(icon: string, conditions: string): string {
-  const value = `${icon} ${conditions}`.toLowerCase();
+function weatherKind(icon: string): string {
+  // The provider icon represents the current condition. The descriptive text
+  // can mention passing showers even when the current icon is clear/cloudy.
+  const value = icon.toLowerCase();
   if (value.includes('thunder')) return 'storm';
   if (value.includes('snow') || value.includes('sleet') || value.includes('ice') || value.includes('hail')) return 'snow';
   if (value.includes('rain') || value.includes('shower') || value.includes('drizzle')) return 'rain';
@@ -115,7 +123,7 @@ function WeatherLayer({ kind }: { kind: string }) {
   if (kind === 'fog' || kind === 'windy') {
     return <div className={`weather-layer weather-${kind}`} aria-hidden="true"><span /><span /><span /><span /></div>;
   }
-  const drops = Array.from({ length: kind === 'storm' ? 48 : kind === 'snow' ? 42 : 38 }, (_, index) => index);
+  const drops = Array.from({ length: kind === 'storm' ? 18 : kind === 'snow' ? 16 : 14 }, (_, index) => index);
   return (
     <div className={`weather-layer weather-${kind}`} aria-hidden="true">
       {drops.map((drop) => (
@@ -131,48 +139,45 @@ export function WeatherExperience({ children }: { children: ReactNode }) {
   const [businessWeather, setBusinessWeather] = useState<WeatherNow | null>(null);
   const [weatherUnavailable, setWeatherUnavailable] = useState(false);
   const [locationStatus, setLocationStatus] = useState<'checking' | 'available' | 'denied' | 'unavailable'>('checking');
+  const [pageVisible, setPageVisible] = useState(!document.hidden);
+  const visitorCoordinates = useRef<{ latitude: number; longitude: number } | null>(null);
 
   useEffect(() => {
     let active = true;
-    let visitorCoordinates: { latitude: number; longitude: number } | null = null;
-
     const refreshBusinessWeather = () => {
-      loadWeather(BUSINESS_COORDS.latitude, BUSINESS_COORDS.longitude, 'mp-weather-business-v1')
+      loadWeather(BUSINESS_COORDS.latitude, BUSINESS_COORDS.longitude, 'mp-weather-business-v2')
         .then((data) => { if (active) { setBusinessWeather(data); setWeatherUnavailable(false); } })
-        .catch(() => { if (active) setWeatherUnavailable(true); });
+        .catch(() => { if (active) { setBusinessWeather(null); setWeatherUnavailable(true); } });
     };
     refreshBusinessWeather();
 
     const loadVisitorWeather = (latitude: number, longitude: number) => {
-      visitorCoordinates = { latitude, longitude };
+      visitorCoordinates.current = { latitude, longitude };
       if (active) setLocationStatus('available');
-      const cacheKey = 'mp-weather-visitor-' + latitude.toFixed(2) + '-' + longitude.toFixed(2);
+      const cacheKey = 'mp-weather-visitor-v2-' + latitude.toFixed(2) + '-' + longitude.toFixed(2);
       loadWeather(latitude, longitude, cacheKey)
         .then((data) => { if (active) setVisitorWeather(data); })
         .catch(() => { if (active) setVisitorWeather(null); });
     };
 
-    let locationAlreadyRequested = false;
     let savedCoordinates: { latitude: number; longitude: number } | null = null;
     try {
-      locationAlreadyRequested = sessionStorage.getItem('mp-location-requested') === '1';
       const saved = sessionStorage.getItem('mp-location-coordinates');
       if (saved) {
-        const parsed = JSON.parse(saved) as { latitude: number; longitude: number };
-        if (Number.isFinite(parsed.latitude) && Number.isFinite(parsed.longitude)) savedCoordinates = parsed;
+        const parsed = JSON.parse(saved) as { latitude: number; longitude: number; savedAt?: number };
+        if (Number.isFinite(parsed.latitude) && Number.isFinite(parsed.longitude) && parsed.savedAt && Date.now() - parsed.savedAt < COORDINATES_MS) savedCoordinates = parsed;
       }
     } catch { /* Continue with office weather. */ }
 
     if (savedCoordinates) {
       loadVisitorWeather(savedCoordinates.latitude, savedCoordinates.longitude);
-    } else if (!locationAlreadyRequested) {
-      try { sessionStorage.setItem('mp-location-requested', '1'); } catch { /* Do not block browsing. */ }
+    } else {
       if ('geolocation' in navigator) {
         navigator.geolocation.getCurrentPosition(
           (position) => {
             if (!active) return;
             const { latitude, longitude } = position.coords;
-            try { sessionStorage.setItem('mp-location-coordinates', JSON.stringify({ latitude, longitude })); } catch { /* Session-only cache is optional. */ }
+            try { sessionStorage.setItem('mp-location-coordinates', JSON.stringify({ latitude, longitude, savedAt: Date.now() })); } catch { /* Session-only cache is optional. */ }
             loadVisitorWeather(latitude, longitude);
           },
           () => { if (active) { setVisitorWeather(null); setLocationStatus('denied'); } },
@@ -181,22 +186,27 @@ export function WeatherExperience({ children }: { children: ReactNode }) {
       } else {
         setLocationStatus('unavailable');
       }
-    } else if (!savedCoordinates) {
-      setLocationStatus('denied');
     }
 
-    const refreshTimer = window.setInterval(() => {
+    const refresh = () => {
+      if (document.hidden) return;
       refreshBusinessWeather();
-      if (visitorCoordinates) {
-        const { latitude, longitude } = visitorCoordinates;
-        const cacheKey = 'mp-weather-visitor-' + latitude.toFixed(2) + '-' + longitude.toFixed(2);
+      if (visitorCoordinates.current) {
+        const { latitude, longitude } = visitorCoordinates.current;
+        const cacheKey = 'mp-weather-visitor-v2-' + latitude.toFixed(2) + '-' + longitude.toFixed(2);
         loadWeather(latitude, longitude, cacheKey)
           .then((data) => { if (active) setVisitorWeather(data); })
           .catch(() => { if (active) setVisitorWeather(null); });
       }
-    }, CACHE_MS);
+    };
+    const refreshTimer = window.setInterval(refresh, CACHE_MS);
+    const onVisibility = () => {
+      setPageVisible(!document.hidden);
+      if (!document.hidden) refresh();
+    };
+    document.addEventListener('visibilitychange', onVisibility);
 
-    return () => { active = false; window.clearInterval(refreshTimer); };
+    return () => { active = false; window.clearInterval(refreshTimer); document.removeEventListener('visibilitychange', onVisibility); };
   }, []);
 
   const requestVisitorWeather = () => {
@@ -205,12 +215,12 @@ export function WeatherExperience({ children }: { children: ReactNode }) {
       return;
     }
     setLocationStatus('checking');
-    try { sessionStorage.setItem('mp-location-requested', '1'); } catch { /* Optional session preference. */ }
     navigator.geolocation.getCurrentPosition(
       (position) => {
         const { latitude, longitude } = position.coords;
-        try { sessionStorage.setItem('mp-location-coordinates', JSON.stringify({ latitude, longitude })); } catch { /* Optional session cache. */ }
-        const cacheKey = 'mp-weather-visitor-' + latitude.toFixed(2) + '-' + longitude.toFixed(2);
+        try { sessionStorage.setItem('mp-location-coordinates', JSON.stringify({ latitude, longitude, savedAt: Date.now() })); } catch { /* Optional session cache. */ }
+        visitorCoordinates.current = { latitude, longitude };
+        const cacheKey = 'mp-weather-visitor-v2-' + latitude.toFixed(2) + '-' + longitude.toFixed(2);
         loadWeather(latitude, longitude, cacheKey)
           .then((data) => { setVisitorWeather(data); setLocationStatus('available'); })
           .catch(() => { setVisitorWeather(null); setLocationStatus('unavailable'); });
@@ -222,14 +232,14 @@ export function WeatherExperience({ children }: { children: ReactNode }) {
 
   const displayedWeather = visitorWeather ?? businessWeather;
   const kind = useMemo(
-    () => displayedWeather ? weatherKind(displayedWeather.icon, displayedWeather.conditions) : 'sun',
+    () => displayedWeather ? weatherKind(displayedWeather.icon) : 'sun',
     [displayedWeather]
   );
 
   return (
     <WeatherContext.Provider value={{ businessWeather, displayedWeather, visitorWeather, weatherUnavailable, locationStatus, requestVisitorWeather }}>
       {children}
-      {displayedWeather && <WeatherLayer kind={kind} />}
+      {displayedWeather && pageVisible && <WeatherLayer kind={kind} />}
     </WeatherContext.Provider>
   );
 }
@@ -239,7 +249,7 @@ export function WeatherWidget() {
   const [temperatureUnit, setTemperatureUnit] = useState<'C' | 'F'>('C');
   if (!weather) return null;
   const { businessWeather, visitorWeather, weatherUnavailable, locationStatus, requestVisitorWeather } = weather;
-  const businessKind = businessWeather ? weatherKind(businessWeather.icon, businessWeather.conditions) : 'sun';
+  const businessKind = businessWeather ? weatherKind(businessWeather.icon) : 'sun';
 
   return (
     <aside className="weather-widget glass-card" aria-label="Current weather at Manisha Properties office">

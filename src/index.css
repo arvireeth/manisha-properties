@@ -318,6 +318,11 @@
 .weather-widget { position: relative; z-index: 2; width: min(100%, 360px); min-height: 148px; padding: 14px 16px; text-align: left; }
 .weather-icon { display: grid; place-items: center; width: 44px; height: 44px; flex: 0 0 auto; border-radius: 12px; border: 1px solid rgba(212,175,55,.24); background: rgba(212,175,55,.08); }
 .weather-temperature { display: inline-block; font: 700 1.8rem/1.2 'Playfair Display',serif; font-variant-numeric: tabular-nums; animation: temperature-arrive .7s ease both; }
+.weather-condition-glow { color: #ffe27a; font-size: .8rem; font-weight: 700; line-height: 1.35; text-shadow: 0 0 10px rgba(255,215,0,.55), 0 0 22px rgba(212,175,55,.25); }
+.weather-area-row { display: flex; align-items: center; gap: .75rem; margin-top: .9rem; padding-top: .8rem; border-top: 1px solid rgba(212,175,55,.18); }
+.weather-area-row .weather-icon { width: 34px; height: 34px; }
+.weather-area-label { color: rgba(248,244,232,.55); font-size: 10px; letter-spacing: .12em; text-transform: uppercase; }
+.weather-area-reading { display: flex; flex-wrap: wrap; align-items: baseline; gap: .55rem; color: rgba(248,244,232,.7); font-size: .75rem; }
 @keyframes temperature-arrive { from { opacity: .35; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
 
 .office-map-shell { position: relative; overflow: hidden; min-height: 340px; border-radius: 18px; }

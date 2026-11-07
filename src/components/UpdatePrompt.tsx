@@ -9,12 +9,25 @@ export default function UpdatePrompt() {
   useEffect(() => {
     let active = true;
     let registration: ServiceWorkerRegistration | undefined;
+    const check = async () => {
+      if (document.hidden || !navigator.onLine || !registration) return;
+      try {
+        await registration.update();
+        // A worker can already be waiting before this page registers its callback.
+        if (active && registration.waiting) setUpdateAvailable(true);
+      } catch {
+        // Offline and temporary network failures should not interrupt browsing.
+      }
+    };
     const update = registerSW({
+      immediate: true,
       onNeedRefresh() {
         if (active) setUpdateAvailable(true);
       },
       onRegisteredSW(_url, currentRegistration) {
         registration = currentRegistration;
+        if (registration?.waiting && active) setUpdateAvailable(true);
+        void check();
       },
       onRegisterError(error) {
         console.error('App update check failed', error);
@@ -22,22 +35,17 @@ export default function UpdatePrompt() {
     });
     updateServiceWorker.current = update;
 
-    const check = () => {
-      if (!document.hidden && navigator.onLine) void registration?.update().catch(() => {
-        // Offline and temporary network failures should not interrupt browsing.
-      });
-    };
     const onVisible = () => {
-      if (!document.hidden) check();
+      if (!document.hidden) void check();
     };
-    const timer = window.setInterval(check, 60 * 60 * 1000);
+    const timer = window.setInterval(() => void check(), 60 * 60 * 1000);
     document.addEventListener('visibilitychange', onVisible);
-    window.addEventListener('online', check);
+    window.addEventListener('online', onVisible);
     return () => {
       active = false;
       window.clearInterval(timer);
       document.removeEventListener('visibilitychange', onVisible);
-      window.removeEventListener('online', check);
+      window.removeEventListener('online', onVisible);
     };
   }, []);
 

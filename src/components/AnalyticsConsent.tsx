@@ -14,8 +14,10 @@ declare global {
 function enableAnalytics() {
   if (window.gtag) return;
   window.dataLayer = window.dataLayer || [];
-  window.gtag = function (...args: unknown[]) {
-    window.dataLayer?.push(args as unknown as IArguments);
+  window.gtag = function () {
+    // The Google tag expects the arguments object used by its standard snippet.
+    // eslint-disable-next-line prefer-rest-params
+    window.dataLayer?.push(arguments);
   };
   window.gtag('consent', 'default', { analytics_storage: 'denied' });
   window.gtag('js', new Date());

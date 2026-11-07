@@ -282,8 +282,8 @@
 @keyframes intro-rule { from { width: 0; opacity: 0; } to { width: 116px; opacity: 1; } }
 
 /* Weather visuals are decorative, subtle and never intercept interaction. */
-.weather-layer { position: fixed; inset: 0; z-index: 40; overflow: hidden; pointer-events: none; opacity: .72; contain: strict; mix-blend-mode: screen; }
-.weather-layer i { position: absolute; top: -14%; display: block; width: 1.8px; height: 30px; border-radius: 2px; background: linear-gradient(transparent,rgba(205,228,250,.92)); filter: drop-shadow(0 0 2px rgba(190,220,255,.35)); animation: weather-fall linear infinite; }
+.weather-layer { position: fixed; inset: 0; z-index: 40; overflow: hidden; pointer-events: none; opacity: .55; contain: strict; }
+.weather-layer i { position: absolute; top: -14%; display: block; width: 1.8px; height: 30px; border-radius: 2px; background: linear-gradient(transparent,rgba(205,228,250,.92)); animation: weather-fall linear infinite; }
 .weather-rain { opacity: .68; }
 .weather-rain::before { content: ''; position: absolute; inset: 0; background: linear-gradient(115deg,transparent 0%,rgba(170,205,235,.035) 48%,transparent 70%); }
 .weather-storm { opacity: .72; }
@@ -337,6 +337,8 @@
 @media (max-width: 640px) {
   .office-map-shell, .office-map-frame { min-height: 290px; height: 290px; }
   .office-map-caption { align-items: flex-start; flex-direction: column; }
+  .glass-card, .glass-card-strong, .btn-glass { backdrop-filter: none; -webkit-backdrop-filter: none; }
+  .weather-layer i:nth-of-type(n+9) { display: none; }
 }
 @media (prefers-reduced-motion: reduce) {
   .opening-intro, .opening-intro *, .weather-layer, .weather-layer *, .weather-temperature, .office-map-marker { animation: none !important; transition: none !important; }

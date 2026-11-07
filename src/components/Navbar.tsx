@@ -1,12 +1,27 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, type MouseEvent } from "react";
 import { Menu, X, Phone } from "lucide-react";
-import { Link, useLocation } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 
-function Navbar() {
+import type { RequestInstall } from "../pages/InstallApp";
+
+function Navbar({ canInstall, requestInstall }: { canInstall: boolean; requestInstall: RequestInstall }) {
   const [scrolled, setScrolled] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
 
   const location = useLocation();
+  const navigate = useNavigate();
+
+  async function handleInstallClick(event: MouseEvent<HTMLAnchorElement>) {
+    setMenuOpen(false);
+    if (!canInstall || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
+
+    event.preventDefault();
+    try {
+      if (!await requestInstall()) navigate("/install");
+    } catch {
+      navigate("/install");
+    }
+  }
 
   useEffect(() => {
     const handleScroll = () => setScrolled(window.scrollY > 40);
@@ -35,6 +50,7 @@ function Navbar() {
     { label: "Home", path: "/" },
     { label: "Property Videos", path: "/videos" },
     { label: "About Us", path: "/about" },
+    { label: "Install App", path: "/install" },
   ];
 
   return (
@@ -74,11 +90,12 @@ function Navbar() {
 
           {/* Desktop Menu */}
 
-          <div className="hidden md:flex items-center gap-8">
+          <div className="hidden md:flex items-center gap-4 lg:gap-8">
             {navItems.map((item) => (
               <Link
                 key={item.path}
                 to={item.path}
+                onClick={item.path === "/install" ? handleInstallClick : undefined}
                 aria-current={location.pathname === item.path ? "page" : undefined}
                 className={`nav-link text-sm tracking-wide transition-colors ${
                   location.pathname === item.path
@@ -130,7 +147,7 @@ function Navbar() {
               key={item.path}
               to={item.path}
               aria-current={location.pathname === item.path ? "page" : undefined}
-              onClick={() => setMenuOpen(false)}
+              onClick={item.path === "/install" ? handleInstallClick : () => setMenuOpen(false)}
               className={`block px-5 py-4 ${
                 location.pathname === item.path
                   ? "text-[#D4AF37]"

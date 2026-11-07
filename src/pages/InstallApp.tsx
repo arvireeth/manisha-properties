@@ -7,9 +7,11 @@ export interface InstallPrompt extends Event {
 
 const installUrl = 'https://manishaproperties.in/install';
 
-export default function InstallApp({ prompt, clearPrompt }: {
-  prompt: InstallPrompt | null;
-  clearPrompt: () => void;
+export type RequestInstall = () => Promise<Awaited<ReturnType<InstallPrompt['prompt']>> | undefined>;
+
+export default function InstallApp({ canInstall, requestInstall }: {
+  canInstall: boolean;
+  requestInstall: RequestInstall;
 }) {
   const [installed, setInstalled] = useState(() =>
     window.matchMedia('(display-mode: standalone)').matches ||
@@ -27,16 +29,15 @@ export default function InstallApp({ prompt, clearPrompt }: {
   }, []);
 
   async function install() {
-    if (!prompt) return;
+    if (!canInstall) return;
     setBusy(true);
     setStatus('');
     try {
-      const { outcome } = await prompt.prompt();
-      if (outcome === 'accepted') setStatus('Installation accepted. Look for Manisha Properties on your Home Screen or in your apps.');
+      const result = await requestInstall();
+      if (result?.outcome === 'accepted') setStatus('Installation accepted. Look for Manisha Properties on your Home Screen or in your apps.');
     } catch {
       setStatus('Use the browser steps below to install the app.');
     } finally {
-      clearPrompt();
       setBusy(false);
     }
   }
@@ -68,7 +69,7 @@ export default function InstallApp({ prompt, clearPrompt }: {
       <h1 className="font-serif text-4xl font-bold gold-text">Install Manisha Properties</h1>
       <p>Add Manisha Properties to your Home Screen for quick access.</p>
       {installed ? <p role="status">Manisha Properties is open as an installed app.</p> :
-        prompt && <button type="button" className="btn-gold" onClick={install} disabled={busy}>Install App</button>}
+        canInstall && <button type="button" className="btn-gold" onClick={install} disabled={busy}>Install App</button>}
       <p role="status">{status}</p>
       <div className="grid gap-4 sm:grid-cols-2">
         {isiPhone ? <>{apple}{android}</> : <>{android}{apple}</>}

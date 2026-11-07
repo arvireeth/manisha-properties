@@ -1,6 +1,6 @@
 
 import { Routes, Route, useLocation } from "react-router-dom";
-import { useEffect, useLayoutEffect, useState } from "react";
+import { useEffect, useLayoutEffect, useRef, useState } from "react";
 
 import Navbar from "./components/Navbar";
 import Footer from "./components/Footer";
@@ -35,12 +35,26 @@ function ScrollToTop() {
 function App() {
   const [installPrompt, setInstallPrompt] = useState<InstallPrompt | null>(null);
 
+  const pendingPrompt = useRef<InstallPrompt | null>(null);
+
+  async function requestInstall() {
+    const prompt = pendingPrompt.current;
+    if (!prompt) return;
+    pendingPrompt.current = null;
+    setInstallPrompt(null);
+    return prompt.prompt();
+  }
+
   useEffect(() => {
     const capturePrompt = (event: Event) => {
       event.preventDefault();
-      setInstallPrompt(event as InstallPrompt);
+      pendingPrompt.current = event as InstallPrompt;
+      setInstallPrompt(pendingPrompt.current);
     };
-    const clearPrompt = () => setInstallPrompt(null);
+    const clearPrompt = () => {
+      pendingPrompt.current = null;
+      setInstallPrompt(null);
+    };
     window.addEventListener('beforeinstallprompt', capturePrompt);
     window.addEventListener('appinstalled', clearPrompt);
     return () => {
@@ -59,14 +73,14 @@ function App() {
       >
         Skip to main content
       </a>
-      <Navbar />
+      <Navbar canInstall={Boolean(installPrompt)} requestInstall={requestInstall} />
 
       <main id="main-content" tabIndex={-1} className="flex-1 focus:outline-none">
         <Routes>
           <Route path="/" element={<Home />} />
           <Route path="/about" element={<About />} />
           <Route path="/videos" element={<Videos />} />
-          <Route path="/install" element={<InstallApp prompt={installPrompt} clearPrompt={() => setInstallPrompt(null)} />} />
+          <Route path="/install" element={<InstallApp canInstall={Boolean(installPrompt)} requestInstall={requestInstall} />} />
           <Route path="/privacy" element={<PrivacyNotice />} />
         </Routes>
       </main>

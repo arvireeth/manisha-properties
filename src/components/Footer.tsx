@@ -1,7 +1,7 @@
 import { Phone, MapPin, Youtube, Home } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
-function Footer() {
+function Footer({ installedMode }: { installedMode: boolean }) {
   return (
     <footer className="relative mt-24 border-t border-[rgba(212,175,55,0.15)]">
       <div className="absolute inset-0 bg-[rgba(10,8,5,0.8)] backdrop-blur-sm" />
@@ -202,12 +202,12 @@ function Footer() {
             >
               Privacy Notice
             </Link>
-            <Link
+            {!installedMode && <Link
               to="/install"
               className="text-xs text-[rgba(248,244,232,0.55)] underline-offset-4 hover:text-[#FFD700] hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#FFD700] focus-visible:ring-offset-2 focus-visible:ring-offset-[#100D08]"
             >
               Install App
-            </Link>
+            </Link>}
             <span className="gold-text text-xs">
               Trusted Real Estate Partner in Delhi NCR
             </span>

@@ -4,7 +4,7 @@ import { Link, useLocation, useNavigate } from "react-router-dom";
 
 import type { RequestInstall } from "../pages/InstallApp";
 
-function Navbar({ canInstall, requestInstall }: { canInstall: boolean; requestInstall: RequestInstall }) {
+function Navbar({ canInstall, requestInstall, installedMode }: { canInstall: boolean; requestInstall: RequestInstall; installedMode: boolean }) {
   const [scrolled, setScrolled] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
 
@@ -50,7 +50,7 @@ function Navbar({ canInstall, requestInstall }: { canInstall: boolean; requestIn
     { label: "Home", path: "/" },
     { label: "Property Videos", path: "/videos" },
     { label: "About Us", path: "/about" },
-    { label: "Install App", path: "/install" },
+    ...(!installedMode ? [{ label: "Install App", path: "/install" }] : []),
   ];
 
   return (

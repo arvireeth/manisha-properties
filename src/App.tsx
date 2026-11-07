@@ -29,6 +29,10 @@ function ScrollToTop() {
 
 function App() {
   const [installPrompt, setInstallPrompt] = useState<InstallPrompt | null>(null);
+  const [installedMode, setInstalledMode] = useState(() =>
+    window.matchMedia('(display-mode: standalone)').matches ||
+    (navigator as Navigator & { standalone?: boolean }).standalone === true
+  );
 
   const pendingPrompt = useRef<InstallPrompt | null>(null);
 
@@ -39,6 +43,18 @@ function App() {
     setInstallPrompt(null);
     return prompt.prompt();
   }
+
+  useEffect(() => {
+    const media = window.matchMedia('(display-mode: standalone)');
+    const updateMode = () => setInstalledMode(media.matches ||
+      (navigator as Navigator & { standalone?: boolean }).standalone === true);
+    media.addEventListener('change', updateMode);
+    window.addEventListener('appinstalled', updateMode);
+    return () => {
+      media.removeEventListener('change', updateMode);
+      window.removeEventListener('appinstalled', updateMode);
+    };
+  }, []);
 
   useEffect(() => {
     const capturePrompt = (event: Event) => {
@@ -69,19 +85,19 @@ function App() {
       >
         Skip to main content
       </a>
-      <Navbar canInstall={Boolean(installPrompt)} requestInstall={requestInstall} />
+      <Navbar canInstall={Boolean(installPrompt)} requestInstall={requestInstall} installedMode={installedMode} />
 
       <main id="main-content" tabIndex={-1} className="flex-1 focus:outline-none">
         <Routes>
           <Route path="/" element={<Home />} />
           <Route path="/about" element={<About />} />
           <Route path="/videos" element={<Videos />} />
-          <Route path="/install" element={<InstallApp canInstall={Boolean(installPrompt)} requestInstall={requestInstall} />} />
+          <Route path="/install" element={<InstallApp canInstall={Boolean(installPrompt)} requestInstall={requestInstall} installedMode={installedMode} />} />
           <Route path="/privacy" element={<PrivacyNotice />} />
         </Routes>
       </main>
 
-      <Footer />
+      <Footer installedMode={installedMode} />
       <ShareContact />
       <AnalyticsConsent />
       <UpdatePrompt />

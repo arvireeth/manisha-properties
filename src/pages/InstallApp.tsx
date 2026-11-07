@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { Helmet } from 'react-helmet-async';
 
 export interface InstallPrompt extends Event {
@@ -9,24 +9,15 @@ const installUrl = 'https://manishaproperties.in/install';
 
 export type RequestInstall = () => Promise<Awaited<ReturnType<InstallPrompt['prompt']>> | undefined>;
 
-export default function InstallApp({ canInstall, requestInstall }: {
+export default function InstallApp({ canInstall, requestInstall, installedMode }: {
   canInstall: boolean;
   requestInstall: RequestInstall;
+  installedMode: boolean;
 }) {
-  const [installed, setInstalled] = useState(() =>
-    window.matchMedia('(display-mode: standalone)').matches ||
-    (navigator as Navigator & { standalone?: boolean }).standalone === true
-  );
   const [status, setStatus] = useState('');
   const [busy, setBusy] = useState(false);
   const isiPhone = /iPhone|iPad|iPod/i.test(navigator.userAgent) ||
     (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
-
-  useEffect(() => {
-    const onInstalled = () => setInstalled(true);
-    window.addEventListener('appinstalled', onInstalled);
-    return () => window.removeEventListener('appinstalled', onInstalled);
-  }, []);
 
   async function install() {
     if (!canInstall) return;
@@ -66,10 +57,10 @@ export default function InstallApp({ canInstall, requestInstall }: {
         <title>Install Manisha Properties</title>
         <link rel="canonical" href={installUrl} />
       </Helmet>
+      {installedMode ? <p role="status">Manisha Properties is open as an installed app.</p> : <>
       <h1 className="font-serif text-4xl font-bold gold-text">Install Manisha Properties</h1>
       <p>Add Manisha Properties to your Home Screen for quick access.</p>
-      {installed ? <p role="status">Manisha Properties is open as an installed app.</p> :
-        canInstall && <button type="button" className="btn-gold" onClick={install} disabled={busy}>Install App</button>}
+      {canInstall && <button type="button" className="btn-gold" onClick={install} disabled={busy}>Install App</button>}
       <p role="status">{status}</p>
       <div className="grid gap-4 sm:grid-cols-2">
         {isiPhone ? <>{apple}{android}</> : <>{android}{apple}</>}
@@ -77,6 +68,7 @@ export default function InstallApp({ canInstall, requestInstall }: {
       <a className="btn-glass inline-flex" href={`https://wa.me/?text=${encodeURIComponent('Install Manisha Properties: ' + installUrl)}`} target="_blank" rel="noopener noreferrer">
         Share install link on WhatsApp
       </a>
+      </>}
     </div>
   );
 }

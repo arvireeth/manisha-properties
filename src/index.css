@@ -337,3 +337,33 @@
 @media (prefers-reduced-motion: reduce) {
   .opening-intro, .opening-intro *, .weather-layer, .weather-layer *, .weather-temperature, .office-map-marker { animation: none !important; transition: none !important; }
 }
+
+/* Update control stays away from the floating share action. */
+.app-update-prompt {
+  position: fixed;
+  left: max(1rem, env(safe-area-inset-left));
+  bottom: max(1rem, env(safe-area-inset-bottom));
+  z-index: 90;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: .7rem;
+  max-width: min(350px, calc(100vw - 5rem));
+  padding: .8rem 1rem;
+  border: 1px solid rgba(212,175,55,.55);
+  border-radius: 12px;
+  color: #f8f4e8;
+  background: #18130b;
+  box-shadow: 0 8px 24px rgba(0,0,0,.35);
+  font-size: .8rem;
+}
+.app-update-actions { display: flex; gap: .65rem; align-items: center; }
+.app-update-actions button {
+  padding: .35rem .6rem;
+  border-radius: 6px;
+  border: 1px solid rgba(212,175,55,.5);
+  color: #ffd700;
+}
+.app-update-actions button:first-child { color: #0a0805; background: #ffd700; }
+.app-update-actions button:disabled { opacity: .6; }
+.app-update-actions button:focus-visible { outline: 2px solid #ffd700; outline-offset: 2px; }

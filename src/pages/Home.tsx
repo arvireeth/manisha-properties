@@ -265,23 +265,25 @@ function Home() {
                 </div>
 
                 <h1 className="font-serif text-4xl sm:text-5xl lg:text-6xl font-bold leading-tight">
-                  <span className="text-[#F8F4E8]">Find Your</span>
+                  <span className="text-[#F8F4E8]">Buy or rent at</span>
                   <br />
-                  <span className="gold-text-shine">Dream Property</span>
+                  <span className="gold-text-shine">DLF Capital Greens</span>
                 </h1>
 
                 <p className="text-base sm:text-lg text-[rgba(248,244,232,0.65)] leading-relaxed max-w-xl">
-                  Manisha Properties brings you exclusive real estate opportunities — from luxury homes
-                  to strategic investments. Expert guidance at every step of your property journey.
+                  Explore property tours in Moti Nagar and speak with Manisha Gupta about availability and viewings.
                 </p>
 
                 <div className="flex flex-wrap gap-4">
                   <button
-                    onClick={() => navigate('/videos')}
+                    onClick={() => navigate('/videos?category=sale')}
                     className="btn-gold flex items-center gap-2 text-sm"
                   >
                     <Play size={16} className="fill-[#0A0805]" />
-                    Watch Property Videos
+                    Browse properties for sale
+                  </button>
+                  <button type="button" onClick={() => navigate('/videos?category=rental')} className="btn-glass text-sm">
+                    Browse rentals
                   </button>
 
                   <a
@@ -338,8 +340,7 @@ function Home() {
                       alt="Manisha Properties visiting card with real estate consulting contact details"
                       width={640}
                       height={960}
-                      fetchPriority="high"
-                      loading="eager"
+                      loading="lazy"
                       decoding="async"
                       className="h-full w-full rounded-xl object-contain"
                     />

@@ -22,7 +22,11 @@ export function VideoCard({ video }: VideoCardProps) {
 
   const youtubeUrl = `https://www.youtube.com/watch?v=${video.id.videoId}`;
 
+  const message = `Hi Manisha, I saw your “${video.snippet.title}” video (${youtubeUrl}). Could you confirm availability and share more details?`;
+  const enquiryUrl = `https://wa.me/918700204768?text=${encodeURIComponent(message)}`;
+
   return (
+    <article className="min-w-0">
     <a
       href={youtubeUrl}
       target="_blank"
@@ -66,5 +70,11 @@ export function VideoCard({ video }: VideoCardProps) {
         )}
       </div>
     </a>
+      <a href={enquiryUrl} target="_blank" rel="noopener noreferrer"
+        className="btn-glass mt-3 inline-flex text-sm"
+        aria-label={`Ask about this property: ${video.snippet.title}`}>
+        Ask about this property
+      </a>
+    </article>
   );
 }

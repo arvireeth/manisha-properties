@@ -1,5 +1,6 @@
 
 import { useEffect, useRef, useState } from 'react';
+import { useLocation } from 'react-router-dom';
 import { Helmet } from 'react-helmet-async';
 import {
   Youtube,
@@ -362,6 +363,12 @@ export function Videos() {
   const [showAll, setShowAll] = useState(false);
   const [selectedPlaylist, setSelectedPlaylist] =
     useState<Playlist | null>(null);
+  const { search } = useLocation();
+
+  useEffect(() => {
+    const category = new URLSearchParams(search).get('category');
+    setSelectedPlaylist(playlists.find((playlist) => playlist.title.toLowerCase() === category) ?? null);
+  }, [search]);
 
   const visiblePlaylists = showAll ? playlists : playlists.slice(0, 2);
 

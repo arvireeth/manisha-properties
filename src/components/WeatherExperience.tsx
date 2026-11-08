@@ -4,15 +4,15 @@ import { CloudDrizzle, CloudFog, CloudLightning, CloudRain, CloudSnow, CloudSun,
 
 type WeatherNow = {
   temp: number;
-  feelslike: number;
+  feelslike?: number;
   humidity: number;
   windspeed: number;
   conditions: string;
   icon: string;
-  datetimeEpoch?: number;
+  source?: 'forecast';
 };
 
-type WeatherResponse = { currentConditions?: WeatherNow };
+type WeatherResponse = { forecast?: Array<WeatherNow & { time: string }> };
 type WeatherContextValue = { businessWeather: WeatherNow | null; displayedWeather: WeatherNow | null; visitorWeather: WeatherNow | null; visitorArea: string | null; weatherUnavailable: boolean; locationStatus: 'checking' | 'available' | 'denied' | 'unavailable'; requestVisitorWeather: () => void };
 
 const WeatherContext = createContext<WeatherContextValue | null>(null);
@@ -52,18 +52,16 @@ async function loadWeather(latitude: number, longitude: number, cacheKey: string
   const cached = readCache(cacheKey);
   if (cached) return cached;
 
-  const place = `${latitude.toFixed(4)},${longitude.toFixed(4)}`;
-  const url = `https://weather.visualcrossing.com/VisualCrossingWebServices/rest/services/timeline/${encodeURIComponent(place)}?unitGroup=metric&include=current&contentType=json`;
-  const response = await fetch(url, { cache: 'no-store', signal: AbortSignal.timeout(8000) });
+  const url = `/api/weather?lat=${latitude.toFixed(2)}&lon=${longitude.toFixed(2)}`;
+  const response = await fetch(url, { signal: AbortSignal.timeout(10000) });
   if (!response.ok) throw new Error(`Weather service returned ${response.status}`);
   const result = (await response.json()) as WeatherResponse;
-  if (!result.currentConditions) throw new Error('Current weather is unavailable');
-
-  const data = result.currentConditions;
+  const now = Date.now();
+  const entries = result.forecast?.filter((entry) => Number.isFinite(Date.parse(entry.time))) ?? [];
+  const data = [...entries].reverse().find((entry) => Date.parse(entry.time) <= now) ?? entries[0];
+  if (!data || Math.abs(now - Date.parse(data.time)) > 2 * 60 * 60 * 1000) throw new Error('Forecast is too old');
+  data.source = 'forecast';
   if (!Number.isFinite(data.temp) || !data.icon || !data.conditions) throw new Error('Invalid current weather');
-  if (data.datetimeEpoch && Math.abs(Date.now() / 1000 - data.datetimeEpoch) > 2 * 60 * 60) {
-    throw new Error('Weather reading is too old');
-  }
   try {
     localStorage.setItem(cacheKey, JSON.stringify({ savedAt: Date.now(), data }));
   } catch {
@@ -164,7 +162,7 @@ export function WeatherExperience({ children }: { children: ReactNode }) {
   useEffect(() => {
     let active = true;
     const refreshBusinessWeather = () => {
-      loadWeather(BUSINESS_COORDS.latitude, BUSINESS_COORDS.longitude, 'mp-weather-business-v2')
+      loadWeather(BUSINESS_COORDS.latitude, BUSINESS_COORDS.longitude, 'mp-weather-business-v3')
         .then((data) => { if (active) { setBusinessWeather(data); setWeatherUnavailable(false); } })
         .catch(() => { if (active) { setBusinessWeather(null); setWeatherUnavailable(true); } });
     };
@@ -177,7 +175,7 @@ export function WeatherExperience({ children }: { children: ReactNode }) {
       lookupVisitorArea(latitude, longitude)
         .then((area) => { if (active && request === locationRequest.current) setVisitorArea(area); })
         .catch(() => { if (active && request === locationRequest.current) setVisitorArea(null); });
-      const cacheKey = 'mp-weather-visitor-v2-' + latitude.toFixed(2) + '-' + longitude.toFixed(2);
+      const cacheKey = 'mp-weather-visitor-v3-' + latitude.toFixed(2) + '-' + longitude.toFixed(2);
       loadWeather(latitude, longitude, cacheKey)
         .then((data) => { if (active && request === locationRequest.current) setVisitorWeather(data); })
         .catch(() => { if (active && request === locationRequest.current) setVisitorWeather(null); });
@@ -205,7 +203,7 @@ export function WeatherExperience({ children }: { children: ReactNode }) {
       refreshBusinessWeather();
       if (visitorCoordinates.current) {
         const { latitude, longitude } = visitorCoordinates.current;
-        const cacheKey = 'mp-weather-visitor-v2-' + latitude.toFixed(2) + '-' + longitude.toFixed(2);
+        const cacheKey = 'mp-weather-visitor-v3-' + latitude.toFixed(2) + '-' + longitude.toFixed(2);
         loadWeather(latitude, longitude, cacheKey)
           .then((data) => { if (active) setVisitorWeather(data); })
           .catch(() => { if (active) setVisitorWeather(null); });
@@ -237,7 +235,7 @@ export function WeatherExperience({ children }: { children: ReactNode }) {
         lookupVisitorArea(latitude, longitude)
           .then((area) => { if (request === locationRequest.current) setVisitorArea(area); })
           .catch(() => { if (request === locationRequest.current) setVisitorArea(null); });
-        const cacheKey = 'mp-weather-visitor-v2-' + latitude.toFixed(2) + '-' + longitude.toFixed(2);
+        const cacheKey = 'mp-weather-visitor-v3-' + latitude.toFixed(2) + '-' + longitude.toFixed(2);
         loadWeather(latitude, longitude, cacheKey)
           .then((data) => { if (request === locationRequest.current) { setVisitorWeather(data); setLocationStatus('available'); } })
           .catch(() => { if (request === locationRequest.current) { setVisitorWeather(null); setLocationStatus('unavailable'); } });
@@ -299,7 +297,7 @@ export function WeatherWidget() {
       </div>
       {businessWeather && (
         <div className="mt-3 flex flex-wrap gap-x-4 gap-y-1 text-[11px] text-[rgba(248,244,232,0.58)]">
-          <span className="inline-flex items-center gap-1"><CloudDrizzle size={12} /> Feels {Math.round(temperatureUnit === 'F' ? (businessWeather.feelslike * 9) / 5 + 32 : businessWeather.feelslike)}°{temperatureUnit}</span>
+          {businessWeather.feelslike !== undefined && Number.isFinite(businessWeather.feelslike) && <span className="inline-flex items-center gap-1"><CloudDrizzle size={12} /> Feels {Math.round(temperatureUnit === 'F' ? (businessWeather.feelslike * 9) / 5 + 32 : businessWeather.feelslike)}°{temperatureUnit}</span>}
           <span className="inline-flex items-center gap-1"><Droplets size={12} /> {Math.round(businessWeather.humidity)}% humidity</span>
           <span className="inline-flex items-center gap-1"><Wind size={12} /> {Math.round(businessWeather.windspeed)} km/h</span>
         </div>
@@ -322,6 +320,7 @@ export function WeatherWidget() {
       </div>
       <div className="mt-2 flex flex-wrap items-center gap-x-2 gap-y-1 text-[10px] text-[rgba(248,244,232,0.58)]">
         {animationKind && <span>Animation follows {visitorWeather ? 'your area' : 'the office'}.</span>}
+        {(businessWeather?.source === 'forecast' || visitorWeather?.source === 'forecast') && <span>Forecast estimate; conditions may differ locally.</span>}
         {!visitorWeather && locationStatus !== 'checking' && (
           <button type="button" onClick={requestVisitorWeather} className="underline underline-offset-2 text-[#D4AF37] hover:text-[#FFD700] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#FFD700]">
             {locationStatus === 'denied' ? 'Enable location in browser settings' : 'Use my local weather'}

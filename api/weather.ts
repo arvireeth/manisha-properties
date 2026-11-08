@@ -1,10 +1,9 @@
 const upstream = 'https://weather.visualcrossing.com/VisualCrossingWebServices/rest/services/timeline/';
 
-export default async function handler(request: Request): Promise<Response> {
+export async function GET(request: Request): Promise<Response> {
   const url = new URL(request.url);
   const lat = Number(url.searchParams.get('lat'));
   const lon = Number(url.searchParams.get('lon'));
-  if (request.method !== 'GET') return new Response('Method not allowed', { status: 405 });
   if (!Number.isFinite(lat) || !Number.isFinite(lon) || Math.abs(lat) > 90 || Math.abs(lon) > 180 ||
       !url.searchParams.has('lat') || !url.searchParams.has('lon')) {
     return new Response('Invalid coordinates', { status: 400 });

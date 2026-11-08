@@ -10,6 +10,7 @@ type WeatherNow = {
   conditions: string;
   icon: string;
   datetimeEpoch?: number;
+  source?: 'forecast';
 };
 
 type WeatherResponse = { currentConditions?: WeatherNow };
@@ -298,7 +299,7 @@ export function WeatherWidget() {
       </div>
       {businessWeather && (
         <div className="mt-3 flex flex-wrap gap-x-4 gap-y-1 text-[11px] text-[rgba(248,244,232,0.58)]">
-          <span className="inline-flex items-center gap-1"><CloudDrizzle size={12} /> Feels {Math.round(temperatureUnit === 'F' ? (businessWeather.feelslike * 9) / 5 + 32 : businessWeather.feelslike)}°{temperatureUnit}</span>
+          {Number.isFinite(businessWeather.feelslike) && <span className="inline-flex items-center gap-1"><CloudDrizzle size={12} /> Feels {Math.round(temperatureUnit === 'F' ? (businessWeather.feelslike * 9) / 5 + 32 : businessWeather.feelslike)}°{temperatureUnit}</span>}
           <span className="inline-flex items-center gap-1"><Droplets size={12} /> {Math.round(businessWeather.humidity)}% humidity</span>
           <span className="inline-flex items-center gap-1"><Wind size={12} /> {Math.round(businessWeather.windspeed)} km/h</span>
         </div>
@@ -321,6 +322,7 @@ export function WeatherWidget() {
       </div>
       <div className="mt-2 flex flex-wrap items-center gap-x-2 gap-y-1 text-[10px] text-[rgba(248,244,232,0.58)]">
         {animationKind && <span>Animation follows {visitorWeather ? 'your area' : 'the office'}.</span>}
+        {(businessWeather?.source === 'forecast' || visitorWeather?.source === 'forecast') && <span>Forecast estimate; conditions may differ locally.</span>}
         {!visitorWeather && locationStatus !== 'checking' && (
           <button type="button" onClick={requestVisitorWeather} className="underline underline-offset-2 text-[#D4AF37] hover:text-[#FFD700] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#FFD700]">
             {locationStatus === 'denied' ? 'Enable location in browser settings' : 'Use my local weather'}

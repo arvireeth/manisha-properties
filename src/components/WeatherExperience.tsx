@@ -52,9 +52,8 @@ async function loadWeather(latitude: number, longitude: number, cacheKey: string
   const cached = readCache(cacheKey);
   if (cached) return cached;
 
-  const place = `${latitude.toFixed(4)},${longitude.toFixed(4)}`;
-  const url = `https://weather.visualcrossing.com/VisualCrossingWebServices/rest/services/timeline/${encodeURIComponent(place)}?unitGroup=metric&include=current&contentType=json`;
-  const response = await fetch(url, { cache: 'no-store', signal: AbortSignal.timeout(8000) });
+  const url = `/api/weather?lat=${latitude.toFixed(2)}&lon=${longitude.toFixed(2)}`;
+  const response = await fetch(url, { signal: AbortSignal.timeout(10000) });
   if (!response.ok) throw new Error(`Weather service returned ${response.status}`);
   const result = (await response.json()) as WeatherResponse;
   if (!result.currentConditions) throw new Error('Current weather is unavailable');

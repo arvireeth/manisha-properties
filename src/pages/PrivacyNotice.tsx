@@ -111,8 +111,9 @@ function PrivacyNotice() {
               office and use local weather conditions for subtle background
               effects. Your browser may ask for permission to share your device
               location when you open the website or installed app. If you allow it, the coordinates are used to request
-              weather for your area; they are not sent to a Manisha Properties
-              website database. If you deny permission or location is unavailable,
+              weather for your area through a short-lived, shared website cache;
+              they are not stored in a Manisha Properties website database.
+              If you deny permission or location is unavailable,
               the website uses office-area weather instead. The location choice
               is not required to browse or use the website.
             </p>
@@ -129,7 +130,8 @@ function PrivacyNotice() {
             <p className="mt-3">
               Weather information is provided by{' '}
               <a href="https://www.visualcrossing.com/" target="_blank" rel="noopener noreferrer" className="text-[#FFD700] underline underline-offset-4">Visual Crossing Weather</a>.
-              The weather provider receives the weather lookup coordinates and
+              The weather provider receives approximate weather lookup coordinates
+              from the website's cache server, while that server receives your
               normal connection information such as your public IP address.
               Weather results are reused for up to 10 minutes from browser storage
               using an approximate-location cache key. The browser or device manages

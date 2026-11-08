@@ -429,14 +429,6 @@ function Home() {
               </div>
 
               <div className="flex items-center gap-4">
-                <button
-                  type="button"
-                  onClick={() => { sale.refresh(); rental.refresh(); }}
-                  disabled={sale.loading || rental.loading}
-                  className="min-h-10 text-sm text-[#D4AF37] underline underline-offset-4 hover:text-[#FFD700] disabled:opacity-50"
-                >
-                  Refresh videos
-                </button>
                 {/* Carousel navigation */}
                 <div className="hidden sm:flex items-center gap-2">
                   <button

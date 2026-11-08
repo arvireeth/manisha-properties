@@ -59,19 +59,19 @@ export function useYouTube(
           part: 'snippet',
           playlistId,
           maxResults: '24',
-          key: API_KEY,
         });
 
         if (pageToken) {
           params.append('pageToken', pageToken);
         }
 
-        const response = await fetch(
-         `https://www.googleapis.com/youtube/v3/playlistItems?${params.toString()}`,
-        {
-          cache: 'no-store',
+        let response = await fetch(`/api/playlist?${params.toString()}`);
+        // Some existing API keys are restricted to browser referrers. Keep the
+        // current path usable if the server is not permitted to use that key.
+        if (!response.ok) {
+          params.set('key', API_KEY);
+          response = await fetch(`https://www.googleapis.com/youtube/v3/playlistItems?${params.toString()}`, { cache: 'no-store' });
         }
-       );
 
         if (!response.ok) {
           throw new Error(`YouTube API error: ${response.status}`);

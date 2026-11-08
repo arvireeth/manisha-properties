@@ -70,7 +70,7 @@ function PlaylistVideos({ playlist }: { playlist: Playlist }) {
 
   useEffect(() => {
     const refreshInterval = window.setInterval(() => {
-      if (!loading) {
+      if (!document.hidden && !loading) {
         refresh();
       }
     }, 5 * 60 * 1000);

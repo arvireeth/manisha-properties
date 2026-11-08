@@ -157,6 +157,19 @@ export function useYouTube(
       requestId.current += 1;
     };
   }, [fetchVideos]);
+  useEffect(() => {
+    const onVisible = () => {
+      if (document.hidden || !navigator.onLine) return;
+      const key = `mp-playlist-v1:${playlistId}:`;
+      if (!readPlaylistCache(key)) fetchVideos();
+    };
+    document.addEventListener('visibilitychange', onVisible);
+    window.addEventListener('online', onVisible);
+    return () => {
+      document.removeEventListener('visibilitychange', onVisible);
+      window.removeEventListener('online', onVisible);
+    };
+  }, [fetchVideos, playlistId]);
   const refresh = useCallback(() => {
     setNextPageToken(undefined);
     setHasMore(false);

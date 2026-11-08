@@ -32,6 +32,19 @@ interface YouTubePlaylistResponse {
   nextPageToken?: string;
 }
 
+const PLAYLIST_CACHE_MS = 5 * 60 * 1000;
+
+function readPlaylistCache(key: string): YouTubePlaylistResponse | null {
+  try {
+    const raw = localStorage.getItem(key);
+    if (!raw) return null;
+    const entry = JSON.parse(raw) as { savedAt: number; result: YouTubePlaylistResponse };
+    return Date.now() - entry.savedAt < PLAYLIST_CACHE_MS && Array.isArray(entry.result.items) ? entry.result : null;
+  } catch {
+    return null;
+  }
+}
+
 export function useYouTube(
   playlistId: YouTubePlaylistId = YOUTUBE_PLAYLISTS.sale
 ) {
@@ -44,7 +57,7 @@ export function useYouTube(
   const requestId = useRef(0);
 
   const fetchVideos = useCallback(
-    async (pageToken?: string) => {
+    async (pageToken?: string, force = false) => {
       const currentRequestId = ++requestId.current;
 
       try {
@@ -59,25 +72,24 @@ export function useYouTube(
           part: 'snippet',
           playlistId,
           maxResults: '24',
-          key: API_KEY,
         });
 
         if (pageToken) {
           params.append('pageToken', pageToken);
         }
 
-        const response = await fetch(
-         `https://www.googleapis.com/youtube/v3/playlistItems?${params.toString()}`,
-        {
-          cache: 'no-store',
+        const cacheKey = `mp-playlist-v1:${playlistId}:${pageToken ?? ''}`;
+        let data = force ? null : readPlaylistCache(cacheKey);
+        if (!data) {
+          params.set('key', API_KEY);
+          const response = await fetch(`https://www.googleapis.com/youtube/v3/playlistItems?${params.toString()}`);
+          if (!response.ok) throw new Error(`YouTube API error: ${response.status}`);
+          data = await response.json() as YouTubePlaylistResponse;
+          if (Array.isArray(data.items)) {
+            try { localStorage.setItem(cacheKey, JSON.stringify({ savedAt: Date.now(), result: data })); }
+            catch { /* Playlist remains usable without browser storage. */ }
+          }
         }
-       );
-
-        if (!response.ok) {
-          throw new Error(`YouTube API error: ${response.status}`);
-        }
-
-        const data: YouTubePlaylistResponse = await response.json();
 
         if (data.error) {
           throw new Error(data.error.message || 'YouTube API Error');
@@ -145,10 +157,23 @@ export function useYouTube(
       requestId.current += 1;
     };
   }, [fetchVideos]);
+  useEffect(() => {
+    const onVisible = () => {
+      if (document.hidden || !navigator.onLine) return;
+      const key = `mp-playlist-v1:${playlistId}:`;
+      if (!readPlaylistCache(key)) fetchVideos();
+    };
+    document.addEventListener('visibilitychange', onVisible);
+    window.addEventListener('online', onVisible);
+    return () => {
+      document.removeEventListener('visibilitychange', onVisible);
+      window.removeEventListener('online', onVisible);
+    };
+  }, [fetchVideos, playlistId]);
   const refresh = useCallback(() => {
     setNextPageToken(undefined);
     setHasMore(false);
-    fetchVideos();
+    fetchVideos(undefined, true);
 }, [fetchVideos]);
   const loadMore = useCallback(() => {
     if (nextPageToken && !loading) {

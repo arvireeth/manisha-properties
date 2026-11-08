@@ -128,14 +128,11 @@ function PrivacyNotice() {
               box simply says “Your area”.
             </p>
             <p className="mt-3">
-              Current weather information is provided by{' '}
-              <a href="https://www.visualcrossing.com/" target="_blank" rel="noopener noreferrer" className="text-[#FFD700] underline underline-offset-4">Visual Crossing Weather</a>.
-              When current weather is unavailable, the site displays an
-              estimated forecast from{' '}
+              The weather card displays an estimated forecast from{' '}
               <a href="https://www.met.no/en" target="_blank" rel="noopener noreferrer" className="text-[#FFD700] underline underline-offset-4">MET Norway</a>{' '}
               (data licensed under{' '}
               <a href="https://creativecommons.org/licenses/by/4.0/" target="_blank" rel="noopener noreferrer" className="text-[#FFD700] underline underline-offset-4">CC BY 4.0</a>).
-              Fallback forecasts may be cached for at least three hours in
+              Forecasts may be cached for at least three hours in
               accordance with the provider's usage requirements.
               The weather provider receives approximate weather lookup coordinates
               from the website's cache server, while that server receives your

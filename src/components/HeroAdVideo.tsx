@@ -91,7 +91,9 @@ export function HeroAdVideo() {
     observer.observe(frame);
     const onVisibilityChange = () => {
       if (document.visibilityState === 'hidden') playerRef.current?.pauseVideo();
-      else if (visibleRef.current) playerRef.current?.playVideo();
+      else if (visibleRef.current && !window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+        playerRef.current?.playVideo();
+      }
     };
     document.addEventListener('visibilitychange', onVisibilityChange);
     return () => {
@@ -120,7 +122,8 @@ export function HeroAdVideo() {
         events: {
           onReady: () => {
             playerRef.current?.mute();
-            if (visibleRef.current && !window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+            if (visibleRef.current && document.visibilityState === 'visible' &&
+              !window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
               playerRef.current?.playVideo();
             }
           },
@@ -169,15 +172,25 @@ export function HeroAdVideo() {
             decoding="async"
             className="h-full w-full object-contain"
           />
-          <button
-            type="button"
-            onClick={playManually}
-            disabled={unavailable}
-            className="absolute bottom-4 left-1/2 -translate-x-1/2 inline-flex items-center gap-2 rounded-full border border-[#D4AF37] bg-[#0A0805]/90 px-4 py-2 text-sm font-medium text-[#F8F4E8] shadow-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#FFD700] disabled:opacity-60"
-          >
-            <Play size={16} aria-hidden="true" />
-            {unavailable ? 'Video unavailable' : 'Play video'}
-          </button>
+          {unavailable ? (
+            <a
+              href={`https://www.youtube.com/watch?v=${VIDEO_ID}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="absolute top-4 right-4 rounded-full border border-[#D4AF37] bg-[#0A0805]/90 px-4 py-2 text-sm text-[#F8F4E8]"
+            >
+              Open on YouTube
+            </a>
+          ) : (
+            <button
+              type="button"
+              onClick={playManually}
+              className="absolute top-4 right-4 inline-flex items-center gap-2 rounded-full border border-[#D4AF37] bg-[#0A0805]/90 px-4 py-2 text-sm font-medium text-[#F8F4E8] shadow-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#FFD700]"
+            >
+              <Play size={16} aria-hidden="true" />
+              Play video
+            </button>
+          )}
         </div>
       </div>
     </div>

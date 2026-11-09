@@ -9,12 +9,36 @@ export default function UpdatePrompt() {
   useEffect(() => {
     let active = true;
     let registration: ServiceWorkerRegistration | undefined;
+    let autoUntil = Date.now() + 30_000;
+    let hiddenAt = 0;
+    let applying = false;
+
+    const applyIfFresh = () => {
+      if (!active || applying || document.hidden || Date.now() > autoUntil) return false;
+      const update = updateServiceWorker.current;
+      if (!update) return false;
+      applying = true;
+      setUpdating(true);
+      void update(true).catch(() => {
+        if (!active) return;
+        applying = false;
+        setUpdating(false);
+        setUpdateAvailable(true);
+      });
+      return true;
+    };
+
+    const handleAvailable = () => {
+      if (!active) return;
+      if (!applyIfFresh()) setUpdateAvailable(true);
+    };
+
     const check = async () => {
       if (document.hidden || !navigator.onLine || !registration) return;
       try {
         await registration.update();
         // A worker can already be waiting before this page registers its callback.
-        if (active && registration.waiting) setUpdateAvailable(true);
+        if (registration.waiting) handleAvailable();
       } catch {
         // Offline and temporary network failures should not interrupt browsing.
       }
@@ -22,11 +46,11 @@ export default function UpdatePrompt() {
     const update = registerSW({
       immediate: true,
       onNeedRefresh() {
-        if (active) setUpdateAvailable(true);
+        handleAvailable();
       },
       onRegisteredSW(_url, currentRegistration) {
         registration = currentRegistration;
-        if (registration?.waiting && active) setUpdateAvailable(true);
+        if (registration?.waiting) handleAvailable();
         void check();
       },
       onRegisterError(error) {
@@ -35,17 +59,34 @@ export default function UpdatePrompt() {
     });
     updateServiceWorker.current = update;
 
+    const onInteraction = () => { autoUntil = 0; };
     const onVisible = () => {
-      if (!document.hidden) void check();
+      if (document.hidden) {
+        hiddenAt = Date.now();
+        return;
+      }
+      const installed = window.matchMedia('(display-mode: standalone)').matches ||
+        (navigator as Navigator & { standalone?: boolean }).standalone === true;
+      if (installed && hiddenAt && Date.now() - hiddenAt >= 30_000) {
+        // A resumed PWA may reuse the old page rather than start a new process.
+        autoUntil = Date.now() + 15_000;
+        if (registration?.waiting) handleAvailable();
+      }
+      hiddenAt = 0;
+      void check();
     };
     const timer = window.setInterval(() => void check(), 60 * 60 * 1000);
     document.addEventListener('visibilitychange', onVisible);
     window.addEventListener('online', onVisible);
+    window.addEventListener('pointerdown', onInteraction, { passive: true });
+    window.addEventListener('keydown', onInteraction);
     return () => {
       active = false;
       window.clearInterval(timer);
       document.removeEventListener('visibilitychange', onVisible);
       window.removeEventListener('online', onVisible);
+      window.removeEventListener('pointerdown', onInteraction);
+      window.removeEventListener('keydown', onInteraction);
     };
   }, []);
 

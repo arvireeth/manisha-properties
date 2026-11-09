@@ -9,6 +9,7 @@ import { WeatherExperience } from "./components/WeatherExperience";
 import AnalyticsConsent from "./components/AnalyticsConsent";
 import OpeningIntro from "./components/OpeningIntro";
 import UpdatePrompt from "./components/UpdatePrompt";
+import ConnectionStatus from "./components/ConnectionStatus";
 
 import Home from "./pages/Home";
 import { About } from "./pages/About";
@@ -86,6 +87,7 @@ function App() {
         Skip to main content
       </a>
       <Navbar canInstall={Boolean(installPrompt)} requestInstall={requestInstall} installedMode={installedMode} />
+      <ConnectionStatus />
 
       <main id="main-content" tabIndex={-1} className="flex-1 focus:outline-none">
         <Routes>

@@ -20,7 +20,7 @@ export default defineConfig({
       manifest: {
         id: '/',
         name: 'Manisha Properties',
-        short_name: 'Manisha Properties',
+        short_name: 'Manisha',
         description: 'Explore properties and real estate services from Manisha Properties.',
         theme_color: '#0A0805',
         background_color: '#0A0805',

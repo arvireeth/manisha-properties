@@ -1,6 +1,8 @@
 import { useEffect, useRef } from 'react';
+import { createPortal } from 'react-dom';
 import { X, ExternalLink } from 'lucide-react';
 import type { YouTubeVideo } from '../types/youtube';
+import { ShareVideoButton } from './ShareVideoButton';
 
 interface VideoModalProps {
   video: YouTubeVideo | null;
@@ -9,24 +11,40 @@ interface VideoModalProps {
 
 export function VideoModal({ video, onClose }: VideoModalProps) {
   const overlayRef = useRef<HTMLDivElement>(null);
+  const closeRef = useRef<HTMLButtonElement>(null);
 
   useEffect(() => {
     if (!video) return;
+    const priorOverflow = document.body.style.overflow;
+    const previousFocus = document.activeElement instanceof HTMLElement ? document.activeElement : null;
     document.body.style.overflow = 'hidden';
+    closeRef.current?.focus();
     const handleKey = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') onClose();
+      if (e.key === 'Escape') {
+        e.stopPropagation();
+        onClose();
+      }
+      if (e.key === 'Tab' && overlayRef.current) {
+        const controls = Array.from(overlayRef.current.querySelectorAll<HTMLElement>('button, a[href]'));
+        const first = controls[0];
+        const last = controls[controls.length - 1];
+        if (e.shiftKey && document.activeElement === first) { e.preventDefault(); last?.focus(); }
+        else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first?.focus(); }
+      }
     };
-    window.addEventListener('keydown', handleKey);
+    document.addEventListener('keydown', handleKey);
     return () => {
-      document.body.style.overflow = '';
-      window.removeEventListener('keydown', handleKey);
+      document.body.style.overflow = priorOverflow;
+      document.removeEventListener('keydown', handleKey);
+      previousFocus?.focus();
     };
   }, [video, onClose]);
 
   if (!video) return null;
 
   const videoId = video.id.videoId;
-  const embedUrl = `https://www.youtube-nocookie.com/embed/${videoId}?autoplay=1&rel=0&modestbranding=1`;
+  const youtubeUrl = `https://www.youtube.com/watch?v=${videoId}`;
+  const embedUrl = `https://www.youtube-nocookie.com/embed/${videoId}?autoplay=1&rel=0`;
 
   const handleOverlayClick = (e: React.MouseEvent) => {
     if (e.target === overlayRef.current) onClose();
@@ -38,40 +56,32 @@ export function VideoModal({ video, onClose }: VideoModalProps) {
     day: 'numeric',
   });
 
-  return (
+  return createPortal(
     <div
       ref={overlayRef}
       onClick={handleOverlayClick}
-      className="fixed inset-0 z-[100] flex items-center justify-center p-4 sm:p-6 animate-fade-in"
+      role="dialog"
+      aria-modal="true"
+      aria-label={`Preview ${video.snippet.title}`}
+      data-video-preview="open"
+      className="fixed inset-0 z-[150] flex items-center justify-center overflow-y-auto p-4 sm:p-6 animate-fade-in"
       style={{ background: 'rgba(0,0,0,0.88)', backdropFilter: 'blur(12px)' }}
     >
-      <div className="relative w-full max-w-4xl animate-fade-in-up">
-        {/* Close */}
-        <button
-          onClick={onClose}
-          className="absolute -top-12 right-0 flex items-center gap-2 text-sm text-[rgba(248,244,232,0.7)] hover:text-[#D4AF37] transition-colors group"
-        >
-          <span className="hidden sm:inline">Close</span>
-          <div className="p-1.5 rounded-full border border-[rgba(255,255,255,0.2)] group-hover:border-[rgba(212,175,55,0.5)] transition-all">
-            <X size={16} />
-          </div>
-        </button>
+      <div className="relative my-auto w-full max-w-4xl animate-fade-in-up">
+        <div className="flex justify-end pb-2">
+          <button
+            ref={closeRef}
+            type="button"
+            onClick={onClose}
+            aria-label="Close video preview"
+            className="inline-flex min-h-11 items-center gap-2 rounded-lg px-3 text-sm text-[#F8F4E8] hover:text-[#D4AF37] focus-visible:outline focus-visible:outline-2 focus-visible:outline-[#FFD700]"
+          >
+            <X size={18} aria-hidden="true" /> Close
+          </button>
+        </div>
 
         {/* Video Player */}
         <div className="glass-card-strong overflow-hidden">
-          <div className="border-b border-[rgba(212,175,55,0.15)] px-5 py-3 flex items-center gap-2">
-            <div className="flex gap-1.5">
-              <span className="w-3 h-3 rounded-full bg-red-500/80" />
-              <span className="w-3 h-3 rounded-full bg-yellow-500/80" />
-              <span className="w-3 h-3 rounded-full bg-green-500/80" />
-            </div>
-            <div className="flex-1 text-center">
-              <span className="text-xs text-[rgba(248,244,232,0.4)] truncate max-w-xs inline-block">
-                youtube-nocookie.com/embed/{videoId}
-              </span>
-            </div>
-          </div>
-
           <div className="youtube-container bg-black">
             <iframe
               src={embedUrl}
@@ -90,16 +100,18 @@ export function VideoModal({ video, onClose }: VideoModalProps) {
                 {video.snippet.channelTitle}
               </span>
               <span>{publishDate}</span>
+              <ShareVideoButton title={video.snippet.title} url={youtubeUrl} className="inline-flex items-center gap-1 text-[#D4AF37] hover:text-[#FFD700]" />
               <a
-                href={`https://www.youtube.com/watch?v=${videoId}`}
+                href={youtubeUrl}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="flex items-center gap-1 text-[rgba(212,175,55,0.7)] hover:text-[#D4AF37] transition-colors ml-auto"
               >
                 <ExternalLink size={12} />
-                Watch on YouTube
+                Open on YouTube
               </a>
             </div>
+            <p className="text-xs text-[rgba(248,244,232,0.55)]">If the preview cannot play, open the video on YouTube.</p>
             {video.snippet.description && (
               <p className="text-xs text-[rgba(248,244,232,0.5)] leading-relaxed line-clamp-3">
                 {video.snippet.description}
@@ -108,6 +120,7 @@ export function VideoModal({ video, onClose }: VideoModalProps) {
           </div>
         </div>
       </div>
-    </div>
+    </div>,
+    document.body
   );
 }

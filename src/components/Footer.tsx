@@ -6,7 +6,7 @@ function Footer({ installedMode }: { installedMode: boolean }) {
     <footer className="relative mt-24 border-t border-[rgba(212,175,55,0.15)]">
       <div className="absolute inset-0 bg-[rgba(10,8,5,0.8)] backdrop-blur-sm" />
 
-      <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-14">
+      <div className="relative max-w-[calc(80rem+4rem)] mx-auto px-4 sm:px-6 lg:px-8 py-14">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-10">
 
           {/* Brand */}

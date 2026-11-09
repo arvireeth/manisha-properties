@@ -19,6 +19,7 @@ import { VideoCard } from '../components/VideoCard';
 import { useNavigate } from 'react-router-dom';
 import WhatsAppEnquiry from '../components/WhatsAppEnquiry';
 import { WeatherWidget } from '../components/WeatherExperience';
+import { HeroAdVideo } from '../components/HeroAdVideo';
 
 const services = [
   { icon: HomeIcon, label: 'Sale', desc: 'Premium property sale listings across Delhi NCR' },
@@ -327,24 +328,12 @@ function Home() {
                 className="relative flex items-center justify-center animate-fade-in"
                 style={{ animationDelay: '0.3s' }}
               >
-                <div className="relative">
+                <div className="relative w-full max-w-sm">
                   {/* Glow rings */}
                   <div className="absolute inset-0 rounded-2xl bg-[rgba(212,175,55,0.15)] blur-3xl scale-110" />
                   <div className="absolute inset-0 rounded-2xl border border-[rgba(212,175,55,0.2)] animate-pulse-gold" />
 
-                  <div className="relative glass-card-strong p-2 max-w-sm w-full mx-auto aspect-[2/3]">
-                    <img
-                      src="/images/Manisha_Properties_visiting_card-640.webp"
-                      srcSet="/images/Manisha_Properties_visiting_card-400.webp 400w, /images/Manisha_Properties_visiting_card-640.webp 640w"
-                      sizes="(max-width: 640px) calc(100vw - 32px), 366px"
-                      alt="Manisha Properties visiting card with real estate consulting contact details"
-                      width={640}
-                      height={960}
-                      loading="lazy"
-                      decoding="async"
-                      className="h-full w-full rounded-xl object-contain"
-                    />
-                  </div>
+                  <HeroAdVideo />
                 </div>
               </div>
             </div>

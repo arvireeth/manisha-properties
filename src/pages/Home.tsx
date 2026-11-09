@@ -253,7 +253,7 @@ function Home() {
             }}
           />
 
-          <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-28 pb-16">
+          <div className="relative z-10 max-w-[calc(80rem+4rem)] mx-auto px-4 sm:px-6 lg:px-8 pt-28 pb-16">
             <div className="grid lg:grid-cols-2 gap-16 items-center">
               {/* Left Content */}
               <div className="space-y-8 animate-fade-in-up">

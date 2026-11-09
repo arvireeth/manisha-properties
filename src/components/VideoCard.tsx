@@ -1,8 +1,7 @@
 import { useState } from 'react';
-import { Play, Calendar } from 'lucide-react';
+import { Calendar } from 'lucide-react';
 import type { YouTubeVideo } from '../types/youtube';
 import { VideoModal } from './VideoModal';
-import { ShareVideoButton } from './ShareVideoButton';
 
 interface VideoCardProps {
   video: YouTubeVideo;
@@ -31,10 +30,10 @@ export function VideoCard({ video }: VideoCardProps) {
 
   return (
     <article className="min-w-0">
-    <button
+      <button
       type="button"
       onClick={() => setPreviewOpen(true)}
-      aria-label={`Play ${video.snippet.title} in the app`}
+      aria-label={`Watch ${video.snippet.title} in the app`}
       className="video-card glass-card w-full min-w-0 text-left border border-[rgba(212,175,55,0.15)] group block focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#FFD700] focus-visible:ring-offset-2 focus-visible:ring-offset-[#17110B]"
     >
       {/* Thumbnail */}
@@ -45,14 +44,6 @@ export function VideoCard({ video }: VideoCardProps) {
           className="absolute inset-0 w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
           loading="lazy"
         />
-        <div className="video-overlay">
-          <div className="relative">
-            <div className="absolute inset-0 rounded-full bg-[#D4AF37] blur-xl opacity-40" />
-            <div className="relative p-4 rounded-full bg-[rgba(212,175,55,0.9)] shadow-[0_0_30px_rgba(212,175,55,0.6)]">
-              <Play size={24} className="text-[#0A0805] fill-[#0A0805] ml-0.5" />
-            </div>
-          </div>
-        </div>
         <div className="absolute top-2 right-2 px-2 py-0.5 rounded bg-[rgba(0,0,0,0.75)] text-[10px] text-white font-medium backdrop-blur-sm">
           YouTube
         </div>
@@ -73,17 +64,13 @@ export function VideoCard({ video }: VideoCardProps) {
           </p>
         )}
       </div>
-    </button>
+      </button>
       <div className="mt-3 flex flex-wrap items-center gap-2">
-        <button type="button" onClick={() => setPreviewOpen(true)} className="btn-glass inline-flex items-center gap-2 text-sm">
-          <Play size={16} aria-hidden="true" /> Play
-        </button>
-        <ShareVideoButton title={video.snippet.title} url={youtubeUrl} className="btn-glass inline-flex items-center gap-2 text-sm" />
-      <a href={enquiryUrl} target="_blank" rel="noopener noreferrer"
-        className="btn-glass inline-flex text-sm"
-        aria-label={`Ask about this property: ${video.snippet.title}`}>
-        Ask about this property
-      </a>
+        <a href={enquiryUrl} target="_blank" rel="noopener noreferrer"
+          className="btn-glass inline-flex text-sm"
+          aria-label={`Ask about this property: ${video.snippet.title}`}>
+          Ask about this property
+        </a>
       </div>
       <VideoModal video={previewOpen ? video : null} onClose={() => setPreviewOpen(false)} />
     </article>

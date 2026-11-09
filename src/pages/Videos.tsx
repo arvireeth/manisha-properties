@@ -476,7 +476,7 @@ export function Videos() {
               <img
                 src="/images/properties/sale.jpg"
                 alt="Representative photograph of premium residential living"
-                loading="lazy"
+                loading="eager"
                 onError={(event) => {
                   event.currentTarget.onerror = null;
                   event.currentTarget.src = '/images/Logo.jpg';

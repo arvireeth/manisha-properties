@@ -44,7 +44,7 @@ export function VideoModal({ video, onClose }: VideoModalProps) {
 
   const videoId = video.id.videoId;
   const youtubeUrl = `https://www.youtube.com/watch?v=${videoId}`;
-  const embedUrl = `https://www.youtube-nocookie.com/embed/${videoId}?autoplay=1&rel=0`;
+  const embedUrl = `https://www.youtube-nocookie.com/embed/${videoId}?autoplay=1&playsinline=1&rel=0`;
 
   const handleOverlayClick = (e: React.MouseEvent) => {
     if (e.target === overlayRef.current) onClose();
@@ -68,7 +68,8 @@ export function VideoModal({ video, onClose }: VideoModalProps) {
       style={{ background: 'rgba(0,0,0,0.88)', backdropFilter: 'blur(12px)' }}
     >
       <div className="relative my-auto w-full max-w-4xl animate-fade-in-up">
-        <div className="flex justify-end pb-2">
+        <div className="flex justify-end items-center gap-3 pb-2">
+          <ShareVideoButton title={video.snippet.title} url={youtubeUrl} className="inline-flex min-h-11 items-center gap-2 rounded-lg px-3 text-sm text-[#D4AF37] hover:text-[#FFD700] focus-visible:outline focus-visible:outline-2 focus-visible:outline-[#FFD700]" />
           <button
             ref={closeRef}
             type="button"
@@ -100,7 +101,6 @@ export function VideoModal({ video, onClose }: VideoModalProps) {
                 {video.snippet.channelTitle}
               </span>
               <span>{publishDate}</span>
-              <ShareVideoButton title={video.snippet.title} url={youtubeUrl} className="inline-flex items-center gap-1 text-[#D4AF37] hover:text-[#FFD700]" />
               <a
                 href={youtubeUrl}
                 target="_blank"

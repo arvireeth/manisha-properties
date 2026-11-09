@@ -1,11 +1,15 @@
+import { useState } from 'react';
 import { Play, Calendar } from 'lucide-react';
 import type { YouTubeVideo } from '../types/youtube';
+import { VideoModal } from './VideoModal';
+import { ShareVideoButton } from './ShareVideoButton';
 
 interface VideoCardProps {
   video: YouTubeVideo;
 }
 
 export function VideoCard({ video }: VideoCardProps) {
+  const [previewOpen, setPreviewOpen] = useState(false);
   const thumbnail =
     video.snippet.thumbnails.maxres?.url ||
     video.snippet.thumbnails.standard?.url ||
@@ -27,11 +31,11 @@ export function VideoCard({ video }: VideoCardProps) {
 
   return (
     <article className="min-w-0">
-    <a
-      href={youtubeUrl}
-      target="_blank"
-      rel="noopener noreferrer"
-      className="video-card glass-card min-w-0 border border-[rgba(212,175,55,0.15)] group block focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#FFD700] focus-visible:ring-offset-2 focus-visible:ring-offset-[#17110B]"
+    <button
+      type="button"
+      onClick={() => setPreviewOpen(true)}
+      aria-label={`Play ${video.snippet.title} in the app`}
+      className="video-card glass-card w-full min-w-0 text-left border border-[rgba(212,175,55,0.15)] group block focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#FFD700] focus-visible:ring-offset-2 focus-visible:ring-offset-[#17110B]"
     >
       {/* Thumbnail */}
       <div className="relative overflow-hidden" style={{ paddingBottom: '56.25%' }}>
@@ -69,12 +73,19 @@ export function VideoCard({ video }: VideoCardProps) {
           </p>
         )}
       </div>
-    </a>
+    </button>
+      <div className="mt-3 flex flex-wrap items-center gap-2">
+        <button type="button" onClick={() => setPreviewOpen(true)} className="btn-glass inline-flex items-center gap-2 text-sm">
+          <Play size={16} aria-hidden="true" /> Play
+        </button>
+        <ShareVideoButton title={video.snippet.title} url={youtubeUrl} className="btn-glass inline-flex items-center gap-2 text-sm" />
       <a href={enquiryUrl} target="_blank" rel="noopener noreferrer"
-        className="btn-glass mt-3 inline-flex text-sm"
+        className="btn-glass inline-flex text-sm"
         aria-label={`Ask about this property: ${video.snippet.title}`}>
         Ask about this property
       </a>
+      </div>
+      <VideoModal video={previewOpen ? video : null} onClose={() => setPreviewOpen(false)} />
     </article>
   );
 }
